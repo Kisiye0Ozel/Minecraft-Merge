@@ -3,172 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Merge Master 50</title>
+    <title>Süper Merge Dünyası</title>
     <script src="https://yandex.ru/games/sdk/v2"></script>
     <style>
-        body { margin: 0; overflow: hidden; background: radial-gradient(circle, #1a1a2e, #16213e); font-family: 'Arial', sans-serif; user-select: none; touch-action: none; }
-        #game-container { width: 100vw; height: 100vh; position: relative; }
+        body { margin: 0; overflow: hidden; background: #2c3e50; font-family: 'Arial Rounded MT Bold', 'Helvetica', sans-serif; user-select: none; touch-action: none; }
+        #game-area { width: 100vw; height: 100vh; position: relative; background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%); }
         
-        #ui { position: absolute; top: 20px; left: 20px; color: gold; font-size: 28px; text-shadow: 2px 2px #000; pointer-events: none; z-index: 10; }
+        /* Üst Panel */
+        #ui { position: absolute; top: 15px; width: 100%; text-align: center; color: white; font-size: 32px; text-shadow: 3px 3px 0px #2980b9; z-index: 10; pointer-events: none; }
         
-        /* Yeni Görsel Buton Tasarımı */
-        #buy-container {
-            position: absolute; bottom: 40px; left: 50%;
-            transform: translateX(-50%); display: flex; flex-direction: column;
-            align-items: center; z-index: 10;
-        }
+        /* Market Butonu Bölgesi */
+        #footer { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: center; z-index: 20; }
         #buy-btn {
-            width: 90px; height: 90px;
-            background: rgba(255, 255, 255, 0.1) url('assets/png1.png') no-repeat center;
-            background-size: 70%; border: 4px solid #e94560; border-radius: 25px;
-            cursor: pointer; position: relative; transition: 0.2s;
-            box-shadow: 0 8px 25px rgba(233, 69, 96, 0.5);
+            width: 120px; height: 120px; background: white url('assets/png1.png') no-repeat center;
+            background-size: 70%; border: 6px solid #f1c40f; border-radius: 30px;
+            cursor: pointer; position: relative; box-shadow: 0 10px 0px #d4ac0d; transition: 0.1s;
         }
-        #buy-btn:disabled { filter: grayscale(1); opacity: 0.7; cursor: not-allowed; }
+        #buy-btn:active { transform: translateY(5px); box-shadow: 0 5px 0px #d4ac0d; }
+        #buy-btn:disabled { filter: grayscale(1); opacity: 0.6; transform: none; box-shadow: none; }
         
-        .price-tag {
-            position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%);
-            background: #ffd700; color: #1a1a2e; padding: 4px 12px;
-            border-radius: 12px; font-weight: bold; font-size: 18px;
-            border: 2px solid #1a1a2e;
+        .price-label {
+            position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+            background: #27ae60; color: white; padding: 5px 15px; border-radius: 20px;
+            font-size: 20px; border: 3px solid white; white-space: nowrap;
         }
 
+        /* OYUN OBJELERİ (BÜYÜTÜLDÜ: 120px) */
         .item {
-            position: absolute; width: 80px; height: 80px; cursor: grab;
+            position: absolute; width: 120px; height: 120px;
             background-size: contain; background-repeat: no-repeat; background-position: center;
-            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform: translate(-50%, -50%); z-index: 1;
+            transform: translate(-50%, -50%); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
         }
-        .item.dragging { transform: translate(-50%, -50%) scale(1.2); z-index: 100; cursor: grabbing; }
+        
+        /* Objelerin üzerindeki büyük sayılar */
+        .level-badge {
+            position: absolute; bottom: -10px; right: -10px;
+            background: #e74c3c; color: white; width: 45px; height: 45px;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 24px; border: 4px solid white; font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
 
-        .particle {
-            position: absolute; width: 10px; height: 10px; border-radius: 50%;
-            pointer-events: none; animation: explode 0.6s ease-out forwards;
+        .dragging { transform: translate(-50%, -50%) scale(1.3) rotate(5deg); z-index: 1000 !important; }
+
+        /* Patlama Parçacıkları */
+        .star {
+            position: absolute; font-size: 30px; pointer-events: none;
+            animation: star-pop 0.8s ease-out forwards;
         }
-        @keyframes explode {
-            to { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+        @keyframes star-pop {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(360deg) scale(0); opacity: 0; }
         }
     </style>
 </head>
 <body>
 
-<div id="game-container">
-    <div id="ui">Para: <span id="money-text">150</span> 💰</div>
+<div id="game-area">
+    <div id="ui">PARA: <span id="money-val">150</span> 💰</div>
     
-    <div id="buy-container">
+    <div id="footer">
         <button id="buy-btn">
-            <div class="price-tag">25 💰</div>
+            <div class="price-label">25 💰</div>
         </button>
     </div>
 </div>
 
 <script>
 let money = 150;
-const container = document.getElementById('game-container');
-const moneyText = document.getElementById('money-text');
+const area = document.getElementById('game-area');
+const moneyDisp = document.getElementById('money-val');
 const buyBtn = document.getElementById('buy-btn');
 
 function updateUI() {
-    moneyText.innerText = Math.floor(money);
+    moneyDisp.innerText = Math.floor(money);
     buyBtn.disabled = money < 25;
 }
 
-buyBtn.addEventListener('click', () => {
+buyBtn.onclick = () => {
     if (money >= 25) {
         money -= 25;
         updateUI();
-        const x = Math.random() * (window.innerWidth - 100) + 50;
-        const y = Math.random() * (window.innerHeight - 250) + 100;
-        createItem(1, x, y);
+        spawn(1, window.innerWidth/2, window.innerHeight/2);
     }
-});
+};
 
-function createItem(level, x, y) {
-    const item = document.createElement('div');
-    item.className = 'item';
-    item.dataset.level = level;
-    item.style.left = x + 'px';
-    item.style.top = y + 'px';
-    item.style.backgroundImage = `url('assets/png${level}.png')`;
-    
-    // Doğma animasyonu
-    item.style.transform = 'translate(-50%, -50%) scale(0)';
-    setTimeout(() => { item.style.transform = 'translate(-50%, -50%) scale(1)'; }, 10);
+function spawn(lvl, x, y) {
+    const el = document.createElement('div');
+    el.className = 'item';
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.style.backgroundImage = `url('assets/png${lvl}.png')`;
+    el.dataset.lvl = lvl;
 
-    makeDraggable(item);
-    container.appendChild(item);
+    // Seviye Numarası (Çocuklar için rehber)
+    const badge = document.createElement('div');
+    badge.className = 'level-badge';
+    badge.innerText = lvl;
+    el.appendChild(badge);
+
+    // Giriş animasyonu
+    el.style.transform = 'translate(-50%, -50%) scale(0)';
+    setTimeout(() => el.style.transform = 'translate(-50%, -50%) scale(1)', 50);
+
+    drag(el);
+    area.appendChild(el);
 }
 
-function makeDraggable(el) {
-    let isDragging = false;
-    let offset = { x: 0, y: 0 };
+function drag(el) {
+    let active = false;
+    let startX, startY;
 
-    const start = (e) => {
-        isDragging = true;
+    const onStart = (e) => {
+        active = true;
         el.classList.add('dragging');
-        const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-        const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
-        offset.x = clientX - el.offsetLeft;
-        offset.y = clientY - el.offsetTop;
+        const point = e.type.includes('touch') ? e.touches[0] : e;
+        startX = point.clientX - el.offsetLeft;
+        startY = point.clientY - el.offsetTop;
     };
 
-    const move = (e) => {
-        if (!isDragging) return;
-        const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-        const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
-        el.style.left = (clientX - offset.x) + 'px';
-        el.style.top = (clientY - offset.y) + 'px';
+    const onMove = (e) => {
+        if (!active) return;
+        const point = e.type.includes('touch') ? e.touches[0] : e;
+        el.style.left = (point.clientX - startX) + 'px';
+        el.style.top = (point.clientY - startY) + 'px';
     };
 
-    const stop = () => {
-        if (!isDragging) return;
-        isDragging = false;
+    const onEnd = () => {
+        if (!active) return;
+        active = false;
         el.classList.remove('dragging');
-        checkMerge(el);
+        check(el);
     };
 
-    el.addEventListener('mousedown', start);
-    window.addEventListener('mousemove', move);
-    window.addEventListener('mouseup', stop);
-    el.addEventListener('touchstart', start, {passive: false});
-    window.addEventListener('touchmove', move, {passive: false});
-    window.addEventListener('touchend', stop);
+    el.onmousedown = onStart;
+    window.onmousemove = onMove;
+    window.onmouseup = onEnd;
+    el.ontouchstart = onStart;
+    window.ontouchmove = onMove;
+    window.ontouchend = onEnd;
 }
 
-function checkMerge(draggedItem) {
-    const items = document.querySelectorAll('.item');
-    const dRect = draggedItem.getBoundingClientRect();
+function check(item) {
+    const others = document.querySelectorAll('.item');
+    const r1 = item.getBoundingClientRect();
 
-    items.forEach(other => {
-        if (other === draggedItem) return;
-        const oRect = other.getBoundingClientRect();
-        const dist = Math.hypot(dRect.x - oRect.x, dRect.y - oRect.y);
+    others.forEach(other => {
+        if (other === item) return;
+        const r2 = other.getBoundingClientRect();
+        const dist = Math.hypot(r1.x - r2.x, r1.y - r2.y);
 
-        if (dist < 60 && draggedItem.dataset.level === other.dataset.level) {
-            const nextLevel = parseInt(draggedItem.dataset.level) + 1;
-            if (nextLevel <= 50) {
-                createExplosion(oRect.x + 40, oRect.y + 40);
-                createItem(nextLevel, oRect.x + 40, oRect.y + 40);
-                draggedItem.remove();
+        // Birleşme mesafesi (Görseller büyüdüğü için 90px ideal)
+        if (dist < 90 && item.dataset.lvl === other.dataset.lvl) {
+            const next = parseInt(item.dataset.lvl) + 1;
+            if (next <= 50) {
+                pop(r2.x + 60, r2.y + 60);
+                spawn(next, r2.x + 60, r2.y + 60);
+                item.remove();
                 other.remove();
-                money += nextLevel * 12;
+                money += next * 15;
                 updateUI();
             }
         }
     });
 }
 
-function createExplosion(x, y) {
-    for (let i = 0; i < 12; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        p.style.left = x + 'px';
-        p.style.top = y + 'px';
-        p.style.backgroundColor = `hsl(${Math.random() * 360}, 80%, 60%)`;
-        p.style.setProperty('--dx', (Math.random() - 0.5) * 150 + 'px');
-        p.style.setProperty('--dy', (Math.random() - 0.5) * 150 + 'px');
-        container.appendChild(p);
-        setTimeout(() => p.remove(), 600);
+function pop(x, y) {
+    const stars = ['⭐', '✨', '🎈', '🌈'];
+    for (let i = 0; i < 10; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        s.innerText = stars[Math.floor(Math.random() * stars.length)];
+        s.style.left = x + 'px';
+        s.style.top = y + 'px';
+        s.style.setProperty('--dx', (Math.random() - 0.5) * 250 + 'px');
+        s.style.setProperty('--dy', (Math.random() - 0.5) * 250 + 'px');
+        area.appendChild(s);
+        setTimeout(() => s.remove(), 800);
     }
 }
 
