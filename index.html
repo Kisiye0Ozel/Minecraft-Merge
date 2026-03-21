@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Merge Master 50</title>
+    <script src="https://yandex.ru/games/sdk/v2"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background: radial-gradient(circle, #1a1a2e, #16213e); font-family: 'Arial', sans-serif; }
+        #game-container { width: 100vw; height: 100vh; position: relative; }
+        
+        /* Yükleme Ekranı */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0f3460; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 1000; color: white;
+        }
+        .spinner { width: 50px; height: 50px; border: 5px solid #fff; border-top-color: #e94560; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Arayüz */
+        #ui { position: absolute; top: 20px; left: 20px; color: gold; font-size: 24px; text-shadow: 2px 2px #000; pointer-events: none; }
+        #buy-btn {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            padding: 15px 40px; font-size: 20px; background: #e94560; color: white;
+            border: none; border-radius: 50px; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+        }
+        #buy-btn:active { transform: translateX(-50%) scale(0.9); }
+
+        /* Oyun Objeleri */
+        .item {
+            position: absolute; width: 70px; height: 70px; cursor: grab;
+            display: flex; justify-content: center; align-items: center;
+            border-radius: 15px; font-weight: bold; color: white;
+            user-select: none; transition: transform 0.1s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            background-size: cover;
+        }
+        
+        /* Patlama Efekti */
+        .particle {
+            position: absolute; width: 10px; height: 10px; background: orange;
+            border-radius: 50%; pointer-events: none; animation: explode 0.6s ease-out forwards;
+        }
+        @keyframes explode {
+            to { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loader">
+    <div class="spinner"></div>
+    <p>Oyun Yükleniyor...</p>
+</div>
+
+<div id="game-container">
+    <div id="ui">Para: <span id="money-text">150</span> 💰</div>
+    <button id="buy-btn">PNG1 Satın Al (25 💰)</button>
+</div>
+
+<script>
+let money = 150;
+let ysdk = null;
+const container = document.getElementById('game-container');
+const moneyText = document.getElementById('money-text');
+
+// 1. Yandex SDK Başlatma
+YaGames.init().then(_sdk => {
+    ysdk = _sdk;
+    setTimeout(() => {
+        document.getElementById('loader').style.display = 'none';
+    }, 1500); // 1.5 saniye yapay yükleme ekranı
+});
+
+// 2. Para Güncelleme
+function updateUI() {
+    moneyText.innerText = money;
+}
+
+// 3. Obje Satın Alma
+document.getElementById('buy-btn').addEventListener('click', () => {
+    if (money >= 25) {
+        money -= 25;
+        updateUI();
+        createItem(1, Math.random() * (window.innerWidth - 80), Math.random() * (window.innerHeight - 150));
+    }
+});
+
+function createItem(level, x, y) {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.dataset.level = level;
+    item.style.left = x + 'px';
+    item.style.top = y + 'px';
+    
+    // PNG Görsellerin varsa buraya bağla:
+    // item.style.backgroundImage = `url('assets/png${level}.png')`;
+    item.style.backgroundColor = `hsl(${level * 40}, 70%, 50%)`; // Geçici renk
+    item.innerText = level;
+
+    // Sürükle Bırak Mantığı
+    makeDraggable(item);
+    container.appendChild(item);
+}
+
+function makeDraggable(el) {
+    let isDragging = false;
+    let offset = { x: 0, y: 0 };
+
+    el.addEventListener('mousedown', start);
+    el.addEventListener('touchstart', start, {passive: false});
+
+    function start(e) {
+        isDragging = true;
+        el.style.zIndex = 100;
+        const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+        const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+        offset.x = clientX - el.offsetLeft;
+        offset.y = clientY - el.offsetTop;
+        document.addEventListener('mousemove', move);
+        document.addEventListener('touchmove', move, {passive: false});
+        document.addEventListener('mouseup', stop);
+        document.addEventListener('touchend', stop);
+    }
+
+    function move(e) {
+        if (!isDragging) return;
+        const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+        const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+        el.style.left = (clientX - offset.x) + 'px';
+        el.style.top = (clientY - offset.y) + 'px';
+    }
+
+    function stop() {
+        if (!isDragging) return;
+        isDragging = false;
+        el.style.zIndex = 1;
+        checkMerge(el);
+        document.removeEventListener('mousemove', move);
+        document.removeEventListener('touchmove', move);
+    }
+}
+
+// 4. Birleştirme ve Patlama
+function checkMerge(draggedItem) {
+    const items = document.querySelectorAll('.item');
+    items.forEach(otherItem => {
+        if (otherItem === draggedItem) return;
+
+        const rect1 = draggedItem.getBoundingClientRect();
+        const rect2 = otherItem.getBoundingClientRect();
+
+        const distance = Math.hypot(rect1.left - rect2.left, rect1.top - rect2.top);
+
+        if (distance < 50 && draggedItem.dataset.level === otherItem.dataset.level) {
+            const nextLevel = parseInt(draggedItem.dataset.level) + 1;
+            if (nextLevel <= 50) {
+                const centerX = rect2.left + 35;
+                const centerY = rect2.top + 35;
+                
+                createExplosion(centerX, centerY);
+                createItem(nextLevel, rect2.left, rect2.top);
+                
+                draggedItem.remove();
+                otherItem.remove();
+                
+                money += nextLevel * 5; // Birleşme ödülü
+                updateUI();
+            }
+        }
+    });
+}
+
+function createExplosion(x, y) {
+    for (let i = 0; i < 15; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = x + 'px';
+        p.style.top = y + 'px';
+        p.style.setProperty('--dx', (Math.random() - 0.5) * 200 + 'px');
+        p.style.setProperty('--dy', (Math.random() - 0.5) * 200 + 'px');
+        container.appendChild(p);
+        setTimeout(() => p.remove(), 600);
+    }
+}
+</script>
+
+</body>
+</html>
