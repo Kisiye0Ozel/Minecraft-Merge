@@ -3,221 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pixel Merge Tycoon 2026</title>
+    <title>Merge Tycoon: Infinite</title>
     <script src="https://yandex.ru/games/sdk/v2"></script>
     <style>
-        :root {
-            --neon-blue: #00f2fe;
-            --neon-pink: #ff007f;
-            --gold: #f1c40f;
-            --mc-green: #3ff23f;
-            --panel-bg: rgba(15, 15, 25, 0.9);
-        }
-
-        body { margin: 0; overflow: hidden; background: #050508; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; touch-action: none; color: white; }
-
-        /* --- MINECRAFT YÜKLEME EKRANI --- */
-        #loading-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #1a1a1a; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; z-index: 9999;
-        }
-        #mc-logo { font-size: 30px; font-weight: bold; color: #fff; text-shadow: 4px 4px #000; letter-spacing: 2px; margin-bottom: 20px; }
-        .pixel-border { width: 250px; height: 30px; border: 4px solid #fff; padding: 2px; background: #000; }
-        #progress-bar { width: 0%; height: 100%; background: var(--mc-green); box-shadow: 0 0 10px var(--mc-green); }
-
-        /* --- ANA UI --- */
-        #game-canvas { width: 100vw; height: 100vh; position: relative; background: radial-gradient(circle, #1b2735 0%, #050508 100%); }
-
-        #ui-top {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            width: 85%; background: var(--panel-bg); backdrop-filter: blur(15px);
-            border: 2px solid var(--neon-blue); border-radius: 20px; padding: 12px;
-            display: flex; flex-direction: column; align-items: center; z-index: 100;
-        }
-        #money-display { font-size: 34px; color: var(--gold); font-weight: bold; text-shadow: 0 0 10px rgba(241, 196, 15, 0.5); }
-        #income-display { font-size: 14px; color: var(--neon-blue); text-transform: uppercase; margin-top: 4px; }
-
-        /* SIRADAKİ HEDEF */
-        #next-target {
-            position: absolute; top: 20px; right: 20px; width: 80px; height: 100px;
-            background: var(--panel-bg); border: 2px solid var(--neon-pink); border-radius: 15px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 90;
-        }
-        #target-img { width: 50px; height: 50px; background-size: contain; background-repeat: no-repeat; filter: brightness(0) invert(1); opacity: 0.3; }
-
-        /* DİL BUTONU VE MENÜSÜ */
-        #lang-btn { position: absolute; bottom: 25px; left: 25px; font-size: 35px; cursor: pointer; z-index: 1000; filter: drop-shadow(0 0 10px var(--neon-blue)); }
-        #lang-menu {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95);
-            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000;
-        }
-        .lang-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px; }
-        .flag-box { text-align: center; cursor: pointer; }
-        .flag-box img { width: 70px; border: 3px solid white; border-radius: 10px; transition: 0.2s; }
-        .flag-box img:active { transform: scale(0.9); }
-
-        /* MARKET SİSTEMİ */
-        #shop { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; z-index: 100; }
-        .buy-card { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .btn-main {
-            width: 90px; height: 90px; background: #fff no-repeat center; background-size: 65%;
-            border: none; border-radius: 20px; cursor: pointer; position: relative;
-            box-shadow: 0 0 15px rgba(255,255,255,0.1); transition: 0.2s;
-        }
-        .btn-ad { background: linear-gradient(45deg, #f1c40f, #e67e22); font-size: 40px; color: white; display: flex; align-items: center; justify-content: center; }
-        .btn-main:active { transform: scale(0.9); }
-        .btn-main:disabled { filter: grayscale(1); opacity: 0.4; }
-        .price-label { background: #27ae60; color: white; padding: 4px 10px; border-radius: 8px; font-weight: bold; font-size: 14px; }
-
-        /* OBJELER VE EFEKTLER */
-        .item { position: absolute; width: 110px; height: 110px; background-size: contain; background-repeat: no-repeat; background-position: center; transform: translate(-50%, -50%); transition: filter 0.3s; }
-        .item-lvl { position: absolute; top: -10px; right: -10px; background: var(--neon-blue); color: #000; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; }
+        :root { --n-blue: #00f2fe; --n-pink: #ff007f; --gold: #f1c40f; --bg: #0d0d12; }
+        body { margin: 0; overflow: hidden; background: var(--bg); font-family: 'Segoe UI', sans-serif; user-select: none; touch-action: none; color: white; }
         
-        .particle { position: absolute; pointer-events: none; animation: part 0.8s forwards; font-size: 25px; }
-        @keyframes part { to { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; } }
+        #game-canvas { width: 100vw; height: 100vh; position: relative; background: radial-gradient(circle, #161b22 0%, #050508 100%); }
+
+        /* Üst Panel */
+        #ui-top {
+            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+            width: 85%; background: rgba(0,0,0,0.8); border: 2px solid var(--n-blue);
+            border-radius: 15px; padding: 10px; text-align: center; z-index: 100;
+        }
+        #money-display { font-size: 32px; color: var(--gold); font-weight: bold; }
+        #turbo-timer { font-size: 12px; color: var(--n-pink); display: none; margin-top: 5px; }
+
+        /* Market */
+        #shop { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; z-index: 100; }
+        .shop-card { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .buy-btn {
+            width: 85px; height: 85px; background: #fff no-repeat center; background-size: 65%;
+            border: 3px solid #444; border-radius: 18px; cursor: pointer; position: relative;
+            transition: 0.1s; box-shadow: 0 4px 0 #222;
+        }
+        .buy-btn:active { transform: translateY(4px); box-shadow: none; }
+        .buy-btn:disabled { filter: grayscale(1); opacity: 0.5; cursor: default; }
+        .price-tag { background: #27ae60; color: white; padding: 2px 8px; border-radius: 6px; font-weight: bold; font-size: 13px; }
+
+        /* Alt Araçlar */
+        #tools { position: absolute; bottom: 25px; left: 20px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
+        .tool-btn { width: 55px; height: 55px; background: rgba(0,0,0,0.7); border: 2px solid var(--n-blue); border-radius: 50%; font-size: 25px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        /* Objeler */
+        .item { position: absolute; width: 100px; height: 100px; background-size: contain; background-repeat: no-repeat; background-position: center; transform: translate(-50%, -50%); cursor: grab; }
+        .item:active { cursor: grabbing; }
+        .item-lvl { position: absolute; top: -5px; right: -5px; background: #000; color: #fff; border: 2px solid var(--n-blue); padding: 2px 6px; border-radius: 6px; font-size: 12px; font-weight: bold; }
+
+        /* Animasyonlar */
+        @keyframes float { 0% { transform: translate(-50%, -55%); } 100% { transform: translate(-50%, -45%); } }
+        .turbo-active { animation: glow 1s infinite alternate; }
+        @keyframes glow { from { box-shadow: 0 0 5px var(--gold); } to { box-shadow: 0 0 20px var(--gold); } }
     </style>
 </head>
 <body>
 
-<div id="loading-screen">
-    <div id="mc-logo">MINECRAFT MERGE</div>
-    <div class="pixel-border"><div id="progress-bar"></div></div>
-</div>
-
-<div id="lang-menu">
-    <h1 id="txt-select">DİL SEÇİN / SELECT LANGUAGE</h1>
-    <div class="lang-grid">
-        <div class="flag-box" onclick="changeLang('tr')"><img src="https://flagcdn.com/w160/tr.png"><p>Türkçe</p></div>
-        <div class="flag-box" onclick="changeLang('en')"><img src="https://flagcdn.com/w160/us.png"><p>English</p></div>
-        <div class="flag-box" onclick="changeLang('ru')"><img src="https://flagcdn.com/w160/ru.png"><p>Русский</p></div>
-        <div class="flag-box" onclick="changeLang('de')"><img src="https://flagcdn.com/w160/de.png"><p>Deutsch</p></div>
-    </div>
-    <button onclick="toggleLang()" style="padding:10px 40px; background:var(--neon-pink); border:none; color:white; border-radius:10px; cursor:pointer;">X</button>
-</div>
-
 <div id="game-canvas">
-    <div id="lang-btn" onclick="toggleLang()">🌐</div>
-
     <div id="ui-top">
-        <div id="money-display">💰 <span id="m-val">150</span></div>
-        <div id="income-display">GELİR: +0/sn</div>
+        <div id="money-display">💰 <span id="m-val">0</span></div>
+        <div id="turbo-timer">🔥 TURBO MOD: <span id="t-val">0</span>s</div>
     </div>
 
-    <div id="next-target">
-        <div id="target-img"></div>
-        <div id="target-lvl" style="font-size:12px; color:var(--neon-pink); font-weight:bold; margin-top:5px;">LVL 2</div>
+    <div id="tools">
+        <div class="tool-btn" onclick="toggleLang()">🌐</div>
+        <div class="tool-btn" onclick="saveGame()">💾</div>
     </div>
 
     <div id="shop">
-        <div class="buy-card">
-            <button id="buy-lvl1" class="btn-main" onclick="buyItem(1, 25)" style="background-image:url('assets/png1.png')">
-                <div class="price-label">25 💰</div>
+        <div class="shop-card">
+            <button id="btn-1" class="buy-btn" onclick="buy(1)" style="background-image:url('assets/png1.png')">
+                <div id="p-1" class="price-tag">25</div>
             </button>
             <span style="font-size:10px">PNG 1</span>
         </div>
-        
-        <div id="dynamic-slot" class="buy-card" style="display:none;">
-            <button id="buy-dynamic" class="btn-main">
-                <div id="dyn-price" class="price-label">75 💰</div>
+        <div id="dyn-slot" class="shop-card" style="display:none">
+            <button id="btn-dyn" class="buy-btn">
+                <div id="p-dyn" class="price-tag">0</div>
             </button>
-            <span id="dyn-txt" style="font-size:10px">PNG 2</span>
+            <span id="txt-dyn" style="font-size:10px">PNG ?</span>
         </div>
-
-        <div class="buy-card">
-            <button class="btn-main btn-ad" onclick="watchRewarded()">📺</button>
-            <span id="txt-gift" style="font-size:10px">HEDİYE</span>
+        <div class="shop-card">
+            <button class="buy-btn" style="background: var(--gold); font-size: 35px;" onclick="watchTurbo()">⚡</button>
+            <span style="font-size:10px">2X HIZ</span>
         </div>
     </div>
 </div>
 
 <script>
-// --- VERİLER VE DİLLER ---
-const dict = {
-    tr: { inc: "GELİR", sel: "DİL SEÇİN", gift: "HEDİYE", win: "TEBRİKLER!", reach: "PNG 50'YE ULAŞTIN!" },
-    en: { inc: "INCOME", sel: "SELECT LANGUAGE", gift: "GIFT", win: "CONGRATS!", reach: "YOU REACHED PNG 50!" },
-    ru: { inc: "ДОХОД", sel: "ВЫБЕРИТЕ ЯЗЫК", gift: "ПОДАРОК", win: "ПОЗДРАВЛЯЕМ!", reach: "ВЫ ДОСТИГЛИ PNG 50!" },
-    de: { inc: "EINKOMMEN", sel: "SPRACHE WÄHLEN", gift: "GESCHENK", win: "GLÜCKWUNSCH!", reach: "PNG 50 ERREICHT!" }
-};
-
-let lang = 'tr';
 let money = 150;
-let lastAdMoney = 150;
 let maxLvl = 1;
+let turboTime = 0;
 let ysdk = null;
-let audioInit = false;
 
-const sndBuy = new Audio('assets/buy.mp3');
-const sndMerge = new Audio('assets/merge.mp3');
+// Fiyat Formülü (Daha yumuşak: 25 * 2.2^seviye)
+const getPrice = (lvl) => Math.floor(25 * Math.pow(2.2, lvl - 1));
 
-// --- YÜKLEME SİMÜLASYONU ---
-let prg = 0;
-const loader = setInterval(() => {
-    prg += Math.random() * 20;
-    document.getElementById('progress-bar').style.width = Math.min(prg, 100) + "%";
-    if(prg >= 100) {
-        clearInterval(loader);
-        setTimeout(() => document.getElementById('loading-screen').style.display = 'none', 600);
-    }
-}, 250);
+YaGames.init().then(sdk => { ysdk = sdk; loadGame(); });
 
-// --- YANDEX SDK ---
-YaGames.init().then(sdk => { ysdk = sdk; });
-
-// --- ANA DÖNGÜ (Tycoon Ekonomi) ---
+// --- EKONOMİ DÖNGÜSÜ ---
 setInterval(() => {
-    let income = 0;
-    document.querySelectorAll('.item').forEach(el => {
-        let l = parseInt(el.dataset.lvl);
-        income += Math.floor(Math.pow(l, 1.7)); // Üssel kazanç artışı
+    let inc = 0;
+    document.querySelectorAll('.item').forEach(i => {
+        inc += Math.pow(parseInt(i.dataset.lvl), 1.6);
     });
-    money += income;
-    updateUI(income);
-    if(money - lastAdMoney >= 250) { lastAdMoney = money; showInterstitial(); }
+    
+    if (turboTime > 0) {
+        inc *= 2;
+        turboTime--;
+        document.getElementById('turbo-timer').style.display = 'block';
+        document.getElementById('t-val').innerText = turboTime;
+        document.getElementById('ui-top').classList.add('turbo-active');
+    } else {
+        document.getElementById('turbo-timer').style.display = 'none';
+        document.getElementById('ui-top').classList.remove('turbo-active');
+    }
+
+    money += Math.floor(inc);
+    updateUI();
+    if(Math.random() < 0.05) saveGame(); // Arada bir oto-save
 }, 1000);
 
-function updateUI(incVal = 0) {
+function updateUI() {
     document.getElementById('m-val').innerText = Math.floor(money);
-    document.getElementById('income-display').innerText = `${dict[lang].inc}: +${incVal}/sn`;
-    document.getElementById('txt-gift').innerText = dict[lang].gift;
-    document.getElementById('txt-select').innerText = dict[lang].sel;
-
-    // Hedef Paneli
-    const next = maxLvl + 1;
-    if(next <= 50) {
-        document.getElementById('target-img').style.backgroundImage = `url('assets/png${next}.png')`;
-        document.getElementById('target-lvl').innerText = "LVL " + next;
-    }
-
-    // Dinamik Market (Üşenler için PNG2+ sistemi)
-    const dynSlot = document.getElementById('dynamic-slot');
-    if(maxLvl >= 4) {
-        dynSlot.style.display = 'flex';
-        let sellLvl = maxLvl - 2;
-        let price = Math.floor(25 * Math.pow(3, sellLvl));
-        const btn = document.getElementById('buy-dynamic');
-        btn.style.backgroundImage = `url('assets/png${sellLvl}.png')`;
-        btn.disabled = money < price;
-        btn.onclick = () => buyItem(sellLvl, price);
-        document.getElementById('dyn-price').innerText = price + " 💰";
-        document.getElementById('dyn-txt').innerText = "PNG " + sellLvl;
+    document.getElementById('btn-1').disabled = (money < 25);
+    
+    if (maxLvl >= 3) {
+        let dLvl = maxLvl - 2;
+        let dPrice = getPrice(dLvl) * 2; // Direkt alma vergisi %100
+        document.getElementById('dyn-slot').style.display = 'flex';
+        document.getElementById('btn-dyn').style.backgroundImage = `url('assets/png${dLvl}.png')`;
+        document.getElementById('p-dyn').innerText = dPrice;
+        document.getElementById('txt-dyn').innerText = "PNG " + dLvl;
+        document.getElementById('btn-dyn').onclick = () => { if(money >= dPrice) { money -= dPrice; createItem(dLvl, innerWidth/2, innerHeight/2); } };
+        document.getElementById('btn-dyn').disabled = (money < dPrice);
     }
 }
 
-// --- AKSİYONLAR ---
-function toggleLang() {
-    const m = document.getElementById('lang-menu');
-    m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
-}
-
-function changeLang(l) { lang = l; updateUI(); toggleLang(); }
-
-function buyItem(lvl, cost) {
-    if(!audioInit) { sndBuy.play(); audioInit = true; }
+function buy(lvl) {
+    let cost = getPrice(lvl);
     if(money >= cost) {
         money -= cost;
-        sndBuy.play().catch(()=>{});
-        createItem(lvl, window.innerWidth/2, window.innerHeight/2);
+        createItem(lvl, innerWidth/2, innerHeight/2);
         updateUI();
     }
 }
@@ -228,85 +145,80 @@ function createItem(lvl, x, y) {
     el.style.left = x + 'px'; el.style.top = y + 'px';
     el.style.backgroundImage = `url('assets/png${lvl}.png')`;
     el.dataset.lvl = lvl;
-
-    // DİNAMİK AURA RENKLERİ
+    el.innerHTML = `<div class="item-lvl">${lvl}</div>`;
+    
+    // Işık efekti
     const colors = ["#fff", "#0f0", "#0af", "#f0f", "#ff0", "#f44"];
-    const glow = colors[Math.min(Math.floor(lvl/8), colors.length-1)];
-    el.style.filter = `drop-shadow(0 0 12px ${glow})`;
-
-    const tag = document.createElement('div');
-    tag.className = 'item-lvl'; tag.innerText = lvl;
-    el.appendChild(tag);
+    el.style.filter = `drop-shadow(0 0 10px ${colors[lvl%6]})`;
 
     makeDraggable(el);
     document.getElementById('game-canvas').appendChild(el);
 }
 
 function makeDraggable(el) {
-    let dx=0, dy=0, drg=false;
-    const s = (e) => {
-        drg=true; el.style.zIndex=1000;
-        const p = e.type.includes('touch')?e.touches[0]:e;
-        dx=p.clientX-el.offsetLeft; dy=p.clientY-el.offsetTop;
+    let dx, dy, drg = false;
+    const start = (e) => {
+        drg = true; el.style.zIndex = 1000;
+        let p = e.type.includes('touch') ? e.touches[0] : e;
+        dx = p.clientX - el.offsetLeft; dy = p.clientY - el.offsetTop;
     };
-    const m = (e) => {
-        if(!drg)return;
-        const p = e.type.includes('touch')?e.touches[0]:e;
-        el.style.left=(p.clientX-dx)+'px'; el.style.top=(p.clientY-dy)+'px';
+    const move = (e) => {
+        if (!drg) return;
+        let p = e.type.includes('touch') ? e.touches[0] : e;
+        el.style.left = (p.clientX - dx) + 'px';
+        el.style.top = (p.clientY - dy) + 'px';
     };
-    const st = () => { if(drg){drg=false; el.style.zIndex=5; checkMerge(el);} };
-    el.onmousedown=s; window.addEventListener('mousemove',m); window.addEventListener('mouseup',st);
-    el.ontouchstart=s; window.addEventListener('touchmove',m,{passive:false}); window.addEventListener('touchend',st);
+    const stop = () => {
+        if (!drg) return;
+        drg = false; el.style.zIndex = 5;
+        checkMerge(el);
+    };
+    el.onmousedown = start; window.addEventListener('mousemove', move); window.addEventListener('mouseup', stop);
+    el.ontouchstart = start; window.addEventListener('touchmove', move); window.addEventListener('touchend', stop);
 }
 
 function checkMerge(dragged) {
     const items = document.querySelectorAll('.item');
     items.forEach(other => {
-        if(other === dragged) return;
-        const d = Math.hypot(dragged.offsetLeft-other.offsetLeft, dragged.offsetTop-other.offsetTop);
-        if(d < 80 && dragged.dataset.lvl === other.dataset.lvl) {
+        if (other === dragged) return;
+        const d = Math.hypot(dragged.offsetLeft - other.offsetLeft, dragged.offsetTop - other.offsetTop);
+        if (d < 70 && dragged.dataset.lvl === other.dataset.lvl) {
             const next = parseInt(dragged.dataset.lvl) + 1;
-            if(next <= 50) {
-                sndMerge.play().catch(()=>{});
-                spawnParts(other.offsetLeft, other.offsetTop);
-                createItem(next, other.offsetLeft, other.offsetTop);
-                if(next > maxLvl) { maxLvl = next; if(next === 50) showInterstitial(); }
-                dragged.remove(); other.remove();
-                updateUI();
-            }
+            createItem(next, other.offsetLeft, other.offsetTop);
+            if(next > maxLvl) maxLvl = next;
+            dragged.remove(); other.remove();
+            updateUI();
         }
     });
 }
 
-function spawnParts(x,y) {
-    const emojis = ['✨','⭐','💥','💎'];
-    for(let i=0; i<10; i++) {
-        const p = document.createElement('div');
-        p.className='particle'; p.innerText=emojis[Math.floor(Math.random()*4)];
-        p.style.left=x+'px'; p.style.top=y+'px';
-        p.style.setProperty('--dx', (Math.random()-0.5)*300+'px');
-        p.style.setProperty('--dy', (Math.random()-0.5)*300+'px');
-        document.body.appendChild(p);
-        setTimeout(()=>p.remove(), 800);
+// --- SAVE / LOAD SİSTEMİ ---
+function saveGame() {
+    const items = [];
+    document.querySelectorAll('.item').forEach(i => items.push({l: i.dataset.lvl, x: i.style.left, y: i.style.top}));
+    const data = { money, maxLvl, items };
+    localStorage.setItem('merge_save', JSON.stringify(data));
+}
+
+function loadGame() {
+    const saved = localStorage.getItem('merge_save');
+    if (saved) {
+        const data = JSON.parse(saved);
+        money = data.money;
+        maxLvl = data.maxLvl;
+        data.items.forEach(i => createItem(i.l, parseInt(i.x), parseInt(i.y)));
+        updateUI();
     }
 }
 
-// --- REKLAMLAR ---
-function showInterstitial() {
-    if(ysdk) ysdk.adv.showFullscreenAdv();
-}
-
-function watchRewarded() {
+// --- REKLAM: TURBO MOD ---
+function watchTurbo() {
     if(ysdk) {
         ysdk.adv.showRewardedVideo({
-            callbacks: {
-                onRewarded: () => {
-                    let g = Math.max(1, maxLvl - 1);
-                    createItem(g, window.innerWidth/2, 100);
-                    alert(dict[lang].gift);
-                }
-            }
+            callbacks: { onRewarded: () => { turboTime += 120; } }
         });
+    } else {
+        turboTime += 30; // Dev modunda 30 saniye ver
     }
 }
 </script>
