@@ -6,258 +6,173 @@
     <title>Merge Master 50</title>
     <script src="https://yandex.ru/games/sdk/v2"></script>
     <style>
-        body { margin: 0; overflow: hidden; background: radial-gradient(circle, #1a1a2e, #16213e); font-family: 'Arial', sans-serif; user-select: none; -webkit-user-select: none; touch-action: none; }
+        body { margin: 0; overflow: hidden; background: radial-gradient(circle, #1a1a2e, #16213e); font-family: 'Arial', sans-serif; user-select: none; touch-action: none; }
         #game-container { width: 100vw; height: 100vh; position: relative; }
         
-        /* Yükleme Ekranı */
-        #loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0f3460; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 1000; color: white;
-            transition: opacity 0.5s ease-out;
-        }
-        .spinner { width: 50px; height: 50px; border: 5px solid #fff; border-top-color: #e94560; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Arayüz */
         #ui { position: absolute; top: 20px; left: 20px; color: gold; font-size: 28px; text-shadow: 2px 2px #000; pointer-events: none; z-index: 10; }
-        #buy-btn {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            padding: 18px 50px; font-size: 22px; background: #e94560; color: white;
-            border: none; border-radius: 50px; cursor: pointer; transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
-            z-index: 10;
+        
+        /* Yeni Görsel Buton Tasarımı */
+        #buy-container {
+            position: absolute; bottom: 40px; left: 50%;
+            transform: translateX(-50%); display: flex; flex-direction: column;
+            align-items: center; z-index: 10;
         }
-        #buy-btn:active { transform: translateX(-50%) scale(0.9); }
-        #buy-btn:disabled { background: #555; cursor: not-allowed; box-shadow: none; }
+        #buy-btn {
+            width: 90px; height: 90px;
+            background: rgba(255, 255, 255, 0.1) url('assets/png1.png') no-repeat center;
+            background-size: 70%; border: 4px solid #e94560; border-radius: 25px;
+            cursor: pointer; position: relative; transition: 0.2s;
+            box-shadow: 0 8px 25px rgba(233, 69, 96, 0.5);
+        }
+        #buy-btn:disabled { filter: grayscale(1); opacity: 0.7; cursor: not-allowed; }
+        
+        .price-tag {
+            position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%);
+            background: #ffd700; color: #1a1a2e; padding: 4px 12px;
+            border-radius: 12px; font-weight: bold; font-size: 18px;
+            border: 2px solid #1a1a2e;
+        }
 
-        /* Oyun Objeleri */
         .item {
             position: absolute; width: 80px; height: 80px; cursor: grab;
-            border-radius: 15px;
-            user-select: none; -webkit-user-select: none;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
-            transform: translate(-50%, -50%); /* Merkezi konumlandırma için */
+            background-size: contain; background-repeat: no-repeat; background-position: center;
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translate(-50%, -50%); z-index: 1;
         }
-        .item.dragging { transform: translate(-50%, -50%) scale(1.1); box-shadow: 0 8px 16px rgba(0,0,0,0.5); cursor: grabbing; }
-        
-        /* Patlama Efekti */
+        .item.dragging { transform: translate(-50%, -50%) scale(1.2); z-index: 100; cursor: grabbing; }
+
         .particle {
-            position: absolute; width: 12px; height: 12px; background: orange;
-            border-radius: 50%; pointer-events: none; animation: explode 0.7s ease-out forwards;
-            z-index: 5;
+            position: absolute; width: 10px; height: 10px; border-radius: 50%;
+            pointer-events: none; animation: explode 0.6s ease-out forwards;
         }
         @keyframes explode {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0); opacity: 0; }
+            to { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
         }
     </style>
 </head>
 <body>
 
-<div id="loader">
-    <div class="spinner"></div>
-    <p>Oyun Yükleniyor...</p>
-</div>
-
 <div id="game-container">
     <div id="ui">Para: <span id="money-text">150</span> 💰</div>
-    <button id="buy-btn">PNG1 Satın Al (25 💰)</button>
+    
+    <div id="buy-container">
+        <button id="buy-btn">
+            <div class="price-tag">25 💰</div>
+        </button>
+    </div>
 </div>
 
 <script>
 let money = 150;
-let ysdk = null;
 const container = document.getElementById('game-container');
 const moneyText = document.getElementById('money-text');
 const buyBtn = document.getElementById('buy-btn');
 
-// --- 1. Yandex SDK Entegrasyonu ---
-YaGames.init().then(_sdk => {
-    ysdk = _sdk;
-    console.log("Yandex SDK yüklendi.");
-    // Gerçek bir yükleme ekranı için ysdk.getPlayer() vb. kullanabilirsin.
-    setTimeout(() => {
-        const loader = document.getElementById('loader');
-        loader.style.opacity = '0';
-        setTimeout(() => loader.style.display = 'none', 500);
-    }, 1500); // 1.5 saniye yapay yükleme
-}).catch(err => {
-    console.error("Yandex SDK yüklenemedi:", err);
-    // SDK yüklenemese bile oyunu başlat
-    document.getElementById('loader').style.display = 'none';
-});
-
-// --- 2. Para ve Arayüz Güncelleme ---
 function updateUI() {
-    moneyText.innerText = money;
+    moneyText.innerText = Math.floor(money);
     buyBtn.disabled = money < 25;
 }
 
-// --- 3. Obje Satın Alma ---
 buyBtn.addEventListener('click', () => {
     if (money >= 25) {
         money -= 25;
         updateUI();
-        // Rastgele bir konumda oluştur
         const x = Math.random() * (window.innerWidth - 100) + 50;
-        const y = Math.random() * (window.innerHeight - 200) + 100;
+        const y = Math.random() * (window.innerHeight - 250) + 100;
         createItem(1, x, y);
     }
 });
 
-// --- 4. Obje Oluşturma (createItem) ---
 function createItem(level, x, y) {
     const item = document.createElement('div');
     item.className = 'item';
     item.dataset.level = level;
     item.style.left = x + 'px';
     item.style.top = y + 'px';
-    
-    // PNG Görsellerini buradan bağla:
-    // assets/png1.png, assets/png2.png ... assets/png50.png
     item.style.backgroundImage = `url('assets/png${level}.png')`;
     
-    // Yandex için ses kontrolü vb. ekleyebilirsin.
-    // console.log(`PNG${level} oluşturuldu.`);
+    // Doğma animasyonu
+    item.style.transform = 'translate(-50%, -50%) scale(0)';
+    setTimeout(() => { item.style.transform = 'translate(-50%, -50%) scale(1)'; }, 10);
 
-    // Sürükle Bırak Mantığı
     makeDraggable(item);
     container.appendChild(item);
 }
 
-// --- 5. Sürükle-Bırak Mantığı (makeDraggable) ---
 function makeDraggable(el) {
     let isDragging = false;
     let offset = { x: 0, y: 0 };
 
-    // Mouse Olayları
-    el.addEventListener('mousedown', start);
-    // Dokunmatik Olaylar
-    el.addEventListener('touchstart', start, {passive: false});
-
-    function start(e) {
+    const start = (e) => {
         isDragging = true;
         el.classList.add('dragging');
-        el.style.zIndex = 100; // En üste getir
-
-        const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-        const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-        
+        const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
         offset.x = clientX - el.offsetLeft;
         offset.y = clientY - el.offsetTop;
-        
-        // Event dinleyicilerini dökümana ekle (fare dışarı çıksa bile takip etsin)
-        document.addEventListener('mousemove', move);
-        document.addEventListener('touchmove', move, {passive: false});
-        document.addEventListener('mouseup', stop);
-        document.addEventListener('touchend', stop);
-        
-        // Yandex reklamları için gerekebilir (sesi durdur vb.)
-        if (e.type === 'touchstart') e.preventDefault(); // Kaydırmayı engelle
-    }
+    };
 
-    function move(e) {
+    const move = (e) => {
         if (!isDragging) return;
-        
-        const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-        const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-        
+        const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
         el.style.left = (clientX - offset.x) + 'px';
         el.style.top = (clientY - offset.y) + 'px';
-        
-        if (e.type === 'touchmove') e.preventDefault(); // Dokunmatik kaydırmayı engelle
-    }
+    };
 
-    function stop() {
+    const stop = () => {
         if (!isDragging) return;
         isDragging = false;
         el.classList.remove('dragging');
-        el.style.zIndex = 1; // Eski haline döndür
-        
-        checkMerge(el); // Bırakıldığında birleştirme kontrolü yap
-        
-        document.removeEventListener('mousemove', move);
-        document.removeEventListener('touchmove', move);
-        document.removeEventListener('mouseup', stop);
-        document.removeEventListener('touchend', stop);
-    }
+        checkMerge(el);
+    };
+
+    el.addEventListener('mousedown', start);
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', stop);
+    el.addEventListener('touchstart', start, {passive: false});
+    window.addEventListener('touchmove', move, {passive: false});
+    window.addEventListener('touchend', stop);
 }
 
-// --- 6. Birleştirme Mantığı ve Çarpışma Kontrolü (checkMerge) ---
 function checkMerge(draggedItem) {
     const items = document.querySelectorAll('.item');
-    items.forEach(otherItem => {
-        if (otherItem === draggedItem) return; // Kendisiyle karşılaştırma
+    const dRect = draggedItem.getBoundingClientRect();
 
-        const rect1 = draggedItem.getBoundingClientRect();
-        const rect2 = otherItem.getBoundingClientRect();
+    items.forEach(other => {
+        if (other === draggedItem) return;
+        const oRect = other.getBoundingClientRect();
+        const dist = Math.hypot(dRect.x - oRect.x, dRect.y - oRect.y);
 
-        // İki objenin merkezleri arasındaki mesafeyi hesapla
-        const centerX1 = rect1.left + rect1.width / 2;
-        const centerY1 = rect1.top + rect1.height / 2;
-        const centerX2 = rect2.left + rect2.width / 2;
-        const centerY2 = rect2.top + rect2.height / 2;
-        
-        const distance = Math.hypot(centerX1 - centerX2, centerY1 - centerY2);
-
-        // Mesafe, objelerin yarıçapından küçükse çarpışma var demektir
-        // Obje genişliği 80px, yarıçap 40px. 50-60px mesafe birleşme için ideal.
-        if (distance < 60 && draggedItem.dataset.level === otherItem.dataset.level) {
-            const currentLevel = parseInt(draggedItem.dataset.level);
-            const nextLevel = currentLevel + 1;
-            
+        if (dist < 60 && draggedItem.dataset.level === other.dataset.level) {
+            const nextLevel = parseInt(draggedItem.dataset.level) + 1;
             if (nextLevel <= 50) {
-                // Patlama efekti
-                createExplosion(centerX2, centerY2);
-                
-                // İkisini sil, yeni üst seviye objeyi oluştur
-                createItem(nextLevel, rect2.left + rect2.width / 2, rect2.top + rect2.height / 2);
+                createExplosion(oRect.x + 40, oRect.y + 40);
+                createItem(nextLevel, oRect.x + 40, oRect.y + 40);
                 draggedItem.remove();
-                otherItem.remove();
-                
-                // Para ekle (seviye arttıkça daha çok para)
-                money += nextLevel * 10;
+                other.remove();
+                money += nextLevel * 12;
                 updateUI();
-                console.log(`PNG${currentLevel} birleşti -> PNG${nextLevel}`);
-            } else {
-                console.log("Maksimum seviyeye (PNG50) ulaşıldı!");
             }
         }
     });
 }
 
-// --- 7. Patlama Efekti (createExplosion) ---
 function createExplosion(x, y) {
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 12; i++) {
         const p = document.createElement('div');
         p.className = 'particle';
         p.style.left = x + 'px';
         p.style.top = y + 'px';
-        
-        // Rastgele fırlama yönü ve mesafesi
-        const angle = Math.random() * Math.PI * 2;
-        const dist = Math.random() * 150 + 50;
-        const dx = Math.cos(angle) * dist + 'px';
-        const dy = Math.sin(angle) * dist + 'px';
-        
-        p.style.setProperty('--dx', dx);
-        p.style.setProperty('--dy', dy);
-        
-        // Rastgele renk (HSL ile canlı renkler)
-        p.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-        
+        p.style.backgroundColor = `hsl(${Math.random() * 360}, 80%, 60%)`;
+        p.style.setProperty('--dx', (Math.random() - 0.5) * 150 + 'px');
+        p.style.setProperty('--dy', (Math.random() - 0.5) * 150 + 'px');
         container.appendChild(p);
-        
-        // Animasyon bittiğinde parçacığı sil
-        setTimeout(() => p.remove(), 700);
+        setTimeout(() => p.remove(), 600);
     }
 }
-</script>
 
+updateUI();
+</script>
 </body>
 </html>
