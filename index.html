@@ -3,43 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Merge Tycoon 2026</title>
+    <title>Merge Tycoon 2026 Pro</title>
     <script src="https://yandex.ru/games/sdk/v2"></script>
     <style>
-        body { margin: 0; overflow: hidden; background: #2c3e50; font-family: 'Arial Rounded MT Bold', sans-serif; user-select: none; touch-action: none; }
-        #game-canvas { width: 100vw; height: 100vh; position: relative; }
+        :root { --main-bg: #2c3e50; --gold: #f1c40f; --green: #2ecc71; }
+        body { margin: 0; overflow: hidden; background: var(--main-bg); font-family: 'Arial Rounded MT Bold', sans-serif; user-select: none; touch-action: none; }
+        #game-canvas { width: 100vw; height: 100vh; position: relative; background: radial-gradient(circle, #34495e, #2c3e50); }
 
         /* Üst Panel: Para ve Kazanç */
         #ui-top { 
             position: absolute; top: 20px; width: 100%; 
-            display: flex; flex-direction: column; align-items: center; pointer-events: none; 
+            display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 10;
         }
-        #money-display { font-size: 40px; color: gold; text-shadow: 2px 2px #000; }
-        #income-display { font-size: 20px; color: #2ecc71; text-shadow: 1px 1px #000; margin-top: 5px; }
+        #money-display { font-size: 45px; color: var(--gold); text-shadow: 3px 3px 0px #000; transition: transform 0.1s; }
+        #income-display { font-size: 22px; color: var(--green); text-shadow: 2px 2px #000; margin-top: 5px; background: rgba(0,0,0,0.3); padding: 5px 20px; border-radius: 20px; }
+
+        /* Sağ Üst: Sıradaki Hedef Paneli */
+        #next-unlock-panel {
+            position: absolute; top: 20px; right: 20px;
+            width: 100px; height: 130px;
+            background: rgba(0, 0, 0, 0.5); border: 3px solid #3498db;
+            border-radius: 20px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; color: white; z-index: 20;
+        }
+        #next-png-preview {
+            width: 65px; height: 65px; background-size: contain;
+            background-repeat: no-repeat; background-position: center;
+            filter: brightness(0); /* Kilitli görünüm */
+            margin-bottom: 5px; transition: 0.3s;
+        }
+        #next-lvl-num { font-size: 16px; font-weight: bold; color: #3498db; }
 
         /* Market Alanı */
-        #shop-layer { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: center; }
+        #shop-layer { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: center; z-index: 20; }
         #buy-btn {
-            width: 120px; height: 120px; background: white url('assets/png1.png') no-repeat center;
-            background-size: 70%; border: 6px solid #f1c40f; border-radius: 30px;
-            cursor: pointer; position: relative; box-shadow: 0 8px 0px #d4ac0d; transition: 0.1s;
+            width: 130px; height: 130px; background: white url('assets/png1.png') no-repeat center;
+            background-size: 70%; border: 6px solid var(--gold); border-radius: 35px;
+            cursor: pointer; position: relative; box-shadow: 0 10px 0px #d4ac0d; transition: 0.1s;
         }
-        #buy-btn:active { transform: translateY(4px); box-shadow: 0 4px 0px #d4ac0d; }
-        #buy-btn:disabled { filter: grayscale(1); opacity: 0.5; }
-        .price-tag { position: absolute; top: -20px; background: #27ae60; color: white; padding: 4px 15px; border-radius: 15px; border: 2px solid white; font-size: 18px; }
+        #buy-btn:active { transform: translateY(5px); box-shadow: 0 5px 0px #d4ac0d; }
+        #buy-btn:disabled { filter: grayscale(1); opacity: 0.5; cursor: not-allowed; }
+        .price-tag { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); background: #27ae60; color: white; padding: 5px 20px; border-radius: 20px; border: 3px solid white; font-size: 20px; white-space: nowrap; }
 
-        /* Objeler */
+        /* Oyun Objeleri (Dev Boyut) */
         .item {
-            position: absolute; width: 110px; height: 110px;
+            position: absolute; width: 120px; height: 120px;
             background-size: contain; background-repeat: no-repeat; background-position: center;
-            transform: translate(-50%, -50%); z-index: 5; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+            transform: translate(-50%, -50%); z-index: 5; filter: drop-shadow(0 8px 10px rgba(0,0,0,0.4));
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .item-lvl {
             position: absolute; bottom: -5px; right: -5px; background: #e67e22; color: white;
-            width: 35px; height: 35px; border-radius: 50%; border: 3px solid white;
-            display: flex; justify-content: center; align-items: center; font-weight: bold;
+            width: 40px; height: 40px; border-radius: 50%; border: 3px solid white;
+            display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 20px;
         }
-        .dragging { z-index: 100; transform: translate(-50%, -50%) scale(1.15); }
+        .dragging { z-index: 100; transform: translate(-50%, -50%) scale(1.25); opacity: 0.8; }
+
+        /* Animasyon Sınıfları */
+        .pump { transform: scale(1.2); }
+        .particle { position: absolute; pointer-events: none; font-size: 30px; animation: part-anim 0.8s ease-out forwards; }
+        @keyframes part-anim { to { transform: translate(var(--dx), var(--dy)) rotate(360deg) scale(0); opacity: 0; } }
     </style>
 </head>
 <body>
@@ -47,7 +70,13 @@
 <div id="game-canvas">
     <div id="ui-top">
         <div id="money-display">💰 <span id="m-val">150</span></div>
-        <div id="income-display">Saniyelik Kazanç: +<span id="i-val">0</span> 💰</div>
+        <div id="income-display">Gelir: +<span id="i-val">0</span>/sn</div>
+    </div>
+
+    <div id="next-unlock-panel">
+        <div style="font-size: 10px; opacity: 0.7;">SIRADAKİ</div>
+        <div id="next-png-preview"></div>
+        <div id="next-lvl-num">LVL 2</div>
     </div>
 
     <div id="shop-layer">
@@ -56,25 +85,30 @@
 </div>
 
 <script>
+// --- DEĞİŞKENLER ---
 let money = 150;
-let lastAdMoney = 150; // Reklam takibi için
+let lastAdMoney = 150;
 let totalIncome = 0;
+let maxLvl = 1;
 let ysdk = null;
 
 // Sesler
 const sndBuy = new Audio('assets/buy.mp3');
 const sndMerge = new Audio('assets/merge.mp3');
 
-// Yandex SDK
-YaGames.init().then(sdk => { ysdk = sdk; });
+// --- YANDEX SDK ---
+YaGames.init().then(sdk => {
+    ysdk = sdk;
+    console.log("Yandex SDK Hazır");
+});
 
-// --- GELİR SİSTEMİ (Saniyelik) ---
+// --- GELİR DÖNGÜSÜ ---
 setInterval(() => {
     let income = 0;
-    const items = document.querySelectorAll('.item');
-    items.forEach(item => {
-        // Formül: Level 1 = 1 para, Level 2 = 2 para... ya da üssel yapabilirsin
-        income += parseInt(item.dataset.lvl); 
+    document.querySelectorAll('.item').forEach(item => {
+        // Gelir Formülü: Level arttıkça kazanç katlanır (Örn: Lvl 1=1, Lvl 2=3, Lvl 3=6...)
+        let lvl = parseInt(item.dataset.lvl);
+        income += Math.floor(lvl * (1 + (lvl * 0.2))); 
     });
     
     totalIncome = income;
@@ -83,31 +117,33 @@ setInterval(() => {
     if (totalIncome > 0) {
         money += totalIncome;
         updateUI();
-        checkAdThreshold();
+        checkAds();
     }
 }, 1000);
 
 function updateUI() {
-    document.getElementById('m-val').innerText = Math.floor(money);
+    const mDisplay = document.getElementById('m-val');
+    mDisplay.innerText = Math.floor(money);
     document.getElementById('buy-btn').disabled = money < 25;
-}
-
-// --- REKLAM KONTROLÜ (Her 250 parada bir) ---
-function checkAdThreshold() {
-    if (money - lastAdMoney >= 250) {
-        lastAdMoney = money;
-        showInterstitial();
+    
+    // Sıradaki hedefi güncelle
+    const preview = document.getElementById('next-png-preview');
+    const nextLvl = maxLvl + 1;
+    if(nextLvl <= 50) {
+        preview.style.backgroundImage = `url('assets/png${nextLvl}.png')`;
+        document.getElementById('next-lvl-num').innerText = "LVL " + nextLvl;
     }
 }
 
-function showInterstitial() {
-    if (ysdk) {
-        ysdk.adv.showFullscreenAdv({
-            callbacks: {
-                onOpen: () => { /* Oyunu duraklatabilirsin */ },
-                onClose: () => { console.log("Reklam bitti, devam!"); }
-            }
-        });
+// --- REKLAM SİSTEMİ ---
+function checkAds() {
+    if (money - lastAdMoney >= 250) {
+        lastAdMoney = money;
+        if (ysdk) {
+            ysdk.adv.showFullscreenAdv({
+                callbacks: { onOpen: () => {}, onClose: () => {} }
+            });
+        }
     }
 }
 
@@ -115,9 +151,12 @@ function showInterstitial() {
 document.getElementById('buy-btn').onclick = () => {
     if (money >= 25) {
         money -= 25;
-        sndBuy.play();
+        sndBuy.play().catch(e => {});
         updateUI();
-        createItem(1, window.innerWidth/2, window.innerHeight/2);
+        // Rastgele güvenli yer bul
+        const x = Math.random() * (window.innerWidth - 150) + 75;
+        const y = Math.random() * (window.innerHeight - 350) + 150;
+        createItem(1, x, y);
     }
 };
 
@@ -132,65 +171,96 @@ function createItem(lvl, x, y) {
     tag.className = 'item-lvl'; tag.innerText = lvl;
     el.appendChild(tag);
 
+    // Giriş Animasyonu
+    el.style.transform = 'translate(-50%, -50%) scale(0)';
+    setTimeout(() => el.style.transform = 'translate(-50%, -50%) scale(1)', 50);
+
     addDrag(el);
     document.getElementById('game-canvas').appendChild(el);
 }
 
+// --- SÜRÜKLE BIRAK ---
 function addDrag(el) {
-    let dx = 0, dy = 0, dragging = false;
+    let dx = 0, dy = 0, active = false;
     
+    const start = (e) => {
+        active = true;
+        el.classList.add('dragging');
+        const p = e.type.includes('touch') ? e.touches[0] : e;
+        dx = p.clientX - el.offsetLeft;
+        dy = p.clientY - el.offsetTop;
+    };
+
     const move = (e) => {
-        if (!dragging) return;
+        if (!active) return;
         const p = e.type.includes('touch') ? e.touches[0] : e;
         el.style.left = (p.clientX - dx) + 'px';
         el.style.top = (p.clientY - dy) + 'px';
     };
 
     const stop = () => {
-        dragging = false;
+        if (!active) return;
+        active = false;
         el.classList.remove('dragging');
         checkMerge(el);
-        window.removeEventListener('mousemove', move);
-        window.removeEventListener('mouseup', stop);
     };
 
-    el.onmousedown = (e) => {
-        dragging = true;
-        el.classList.add('dragging');
-        dx = e.clientX - el.offsetLeft;
-        dy = e.clientY - el.offsetTop;
-        window.addEventListener('mousemove', move);
-        window.addEventListener('mouseup', stop);
-    };
-
-    // Mobil için aynı mantık
-    el.ontouchstart = (e) => {
-        dragging = true;
-        el.classList.add('dragging');
-        dx = e.touches[0].clientX - el.offsetLeft;
-        dy = e.touches[0].clientY - el.offsetTop;
-        window.addEventListener('touchmove', move, {passive:false});
-        window.addEventListener('touchend', stop);
-    };
+    el.onmousedown = start;
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', stop);
+    el.ontouchstart = start;
+    window.addEventListener('touchmove', move, {passive: false});
+    window.addEventListener('touchend', stop);
 }
 
+// --- BİRLEŞTİRME ---
 function checkMerge(dragged) {
     const items = document.querySelectorAll('.item');
+    let merged = false;
+
     items.forEach(other => {
-        if (other === dragged) return;
+        if (other === dragged || merged) return;
         const dist = Math.hypot(dragged.offsetLeft - other.offsetLeft, dragged.offsetTop - other.offsetTop);
         
-        if (dist < 80 && dragged.dataset.lvl === other.dataset.lvl) {
+        if (dist < 90 && dragged.dataset.lvl === other.dataset.lvl) {
             const next = parseInt(dragged.dataset.lvl) + 1;
             if (next <= 50) {
-                sndMerge.play();
+                merged = true;
+                sndMerge.play().catch(e => {});
+                spawnPop(other.offsetLeft, other.offsetTop);
                 createItem(next, other.offsetLeft, other.offsetTop);
+                
+                if (next > maxLvl) {
+                    maxLvl = next;
+                    // Yeni kilit açılma efekti
+                    document.getElementById('money-display').classList.add('pump');
+                    setTimeout(() => document.getElementById('money-display').classList.remove('pump'), 300);
+                }
+                
                 dragged.remove();
                 other.remove();
+                updateUI();
             }
         }
     });
 }
+
+function spawnPop(x, y) {
+    const icons = ['✨', '⭐', '🎈', '🎉'];
+    for (let i = 0; i < 10; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.innerText = icons[Math.floor(Math.random() * icons.length)];
+        p.style.left = x + 'px'; p.style.top = y + 'px';
+        p.style.setProperty('--dx', (Math.random() - 0.5) * 250 + 'px');
+        p.style.setProperty('--dy', (Math.random() - 0.5) * 250 + 'px');
+        document.getElementById('game-canvas').appendChild(p);
+        setTimeout(() => p.remove(), 800);
+    }
+}
+
+// Başlangıç Ayarı
+updateUI();
 </script>
 </body>
 </html>
