@@ -3,236 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Merge World Pro</title>
+    <title>Merge Tycoon 2026</title>
     <script src="https://yandex.ru/games/sdk/v2"></script>
     <style>
-        /* Arka planı senin ayarlayabilmen için şeffaf bıraktım, body'e görsel ekleyebilirsin */
-        body { 
-            margin: 0; overflow: hidden; 
-            background: #34495e; /* Burayı kendi görselinle değiştirebilirsin */
-            font-family: 'Arial Rounded MT Bold', sans-serif; 
-            user-select: none; touch-action: none; 
-        }
-        
+        body { margin: 0; overflow: hidden; background: #2c3e50; font-family: 'Arial Rounded MT Bold', sans-serif; user-select: none; touch-action: none; }
         #game-canvas { width: 100vw; height: 100vh; position: relative; }
 
-        /* Para Göstergesi ve Animasyonu */
-        #ui-layer { 
+        /* Üst Panel: Para ve Kazanç */
+        #ui-top { 
             position: absolute; top: 20px; width: 100%; 
-            display: flex; justify-content: center; pointer-events: none; 
+            display: flex; flex-direction: column; align-items: center; pointer-events: none; 
         }
-        #money-container {
-            background: rgba(0,0,0,0.5); padding: 10px 30px; 
-            border-radius: 50px; border: 3px solid gold;
-            color: gold; font-size: 35px; transition: transform 0.2s;
-        }
-        .money-pump { transform: scale(1.3); color: #2ecc71 !important; }
-        .money-drain { transform: scale(0.8); color: #e74c3c !important; }
+        #money-display { font-size: 40px; color: gold; text-shadow: 2px 2px #000; }
+        #income-display { font-size: 20px; color: #2ecc71; text-shadow: 1px 1px #000; margin-top: 5px; }
 
-        /* Market Butonu */
-        #shop-layer { 
-            position: absolute; bottom: 40px; width: 100%; 
-            display: flex; justify-content: center; 
-        }
+        /* Market Alanı */
+        #shop-layer { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: center; }
         #buy-btn {
-            width: 130px; height: 130px; 
-            background: white url('assets/png1.png') no-repeat center;
-            background-size: 70%; border: 6px solid #f1c40f; 
-            border-radius: 35px; cursor: pointer; position: relative;
-            box-shadow: 0 10px 0px #d4ac0d; transition: 0.1s;
+            width: 120px; height: 120px; background: white url('assets/png1.png') no-repeat center;
+            background-size: 70%; border: 6px solid #f1c40f; border-radius: 30px;
+            cursor: pointer; position: relative; box-shadow: 0 8px 0px #d4ac0d; transition: 0.1s;
         }
-        #buy-btn:active { transform: translateY(5px); box-shadow: 0 5px 0px #d4ac0d; }
+        #buy-btn:active { transform: translateY(4px); box-shadow: 0 4px 0px #d4ac0d; }
         #buy-btn:disabled { filter: grayscale(1); opacity: 0.5; }
+        .price-tag { position: absolute; top: -20px; background: #27ae60; color: white; padding: 4px 15px; border-radius: 15px; border: 2px solid white; font-size: 18px; }
 
-        .price-tag {
-            position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
-            background: #27ae60; color: white; padding: 5px 20px;
-            border-radius: 20px; border: 3px solid white; font-size: 22px;
-        }
-
-        /* OYUN OBJELERİ */
+        /* Objeler */
         .item {
-            position: absolute; width: 120px; height: 120px;
+            position: absolute; width: 110px; height: 110px;
             background-size: contain; background-repeat: no-repeat; background-position: center;
-            transform: translate(-50%, -50%); z-index: 5;
-            filter: drop-shadow(0 8px 10px rgba(0,0,0,0.4));
-            transition: transform 0.1s ease-out;
+            transform: translate(-50%, -50%); z-index: 5; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
         }
-        .item-level {
-            position: absolute; bottom: -5px; right: -5px;
-            background: #e67e22; color: white; width: 40px; height: 40px;
-            border-radius: 50%; border: 3px solid white;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 20px; font-weight: bold;
+        .item-lvl {
+            position: absolute; bottom: -5px; right: -5px; background: #e67e22; color: white;
+            width: 35px; height: 35px; border-radius: 50%; border: 3px solid white;
+            display: flex; justify-content: center; align-items: center; font-weight: bold;
         }
-        .dragging { z-index: 100 !important; transform: translate(-50%, -50%) scale(1.2); }
-
-        /* Efektler */
-        .particle {
-            position: absolute; pointer-events: none; font-size: 30px;
-            animation: float-out 0.8s ease-out forwards;
-        }
-        @keyframes float-out {
-            to { transform: translate(var(--dx), var(--dy)) rotate(360deg) scale(0); opacity: 0; }
-        }
+        .dragging { z-index: 100; transform: translate(-50%, -50%) scale(1.15); }
     </style>
 </head>
 <body>
 
 <div id="game-canvas">
-    <div id="ui-layer">
-        <div id="money-container">💰 <span id="money-val">150</span></div>
+    <div id="ui-top">
+        <div id="money-display">💰 <span id="m-val">150</span></div>
+        <div id="income-display">Saniyelik Kazanç: +<span id="i-val">0</span> 💰</div>
     </div>
 
     <div id="shop-layer">
-        <button id="buy-btn">
-            <div class="price-tag">25 💰</div>
-        </button>
+        <button id="buy-btn"><div class="price-tag">25 💰</div></button>
     </div>
 </div>
 
 <script>
 let money = 150;
-const canvas = document.getElementById('game-canvas');
-const moneyVal = document.getElementById('money-val');
-const moneyCont = document.getElementById('money-container');
-const buyBtn = document.getElementById('buy-btn');
+let lastAdMoney = 150; // Reklam takibi için
+let totalIncome = 0;
+let ysdk = null;
 
-// --- PARA ANİMASYONU ---
-function updateMoney(amount, type) {
-    money += amount;
-    moneyVal.innerText = Math.floor(money);
+// Sesler
+const sndBuy = new Audio('assets/buy.mp3');
+const sndMerge = new Audio('assets/merge.mp3');
+
+// Yandex SDK
+YaGames.init().then(sdk => { ysdk = sdk; });
+
+// --- GELİR SİSTEMİ (Saniyelik) ---
+setInterval(() => {
+    let income = 0;
+    const items = document.querySelectorAll('.item');
+    items.forEach(item => {
+        // Formül: Level 1 = 1 para, Level 2 = 2 para... ya da üssel yapabilirsin
+        income += parseInt(item.dataset.lvl); 
+    });
     
-    const animClass = type === 'win' ? 'money-pump' : 'money-drain';
-    moneyCont.classList.add(animClass);
-    setTimeout(() => moneyCont.classList.remove(animClass), 250);
+    totalIncome = income;
+    document.getElementById('i-val').innerText = totalIncome;
     
-    buyBtn.disabled = money < 25;
+    if (totalIncome > 0) {
+        money += totalIncome;
+        updateUI();
+        checkAdThreshold();
+    }
+}, 1000);
+
+function updateUI() {
+    document.getElementById('m-val').innerText = Math.floor(money);
+    document.getElementById('buy-btn').disabled = money < 25;
 }
 
-// --- DOĞMA NOKTASI HESAPLAMA (Üst üste binmemesi için) ---
-function getSafeSpawnPos() {
-    let x, y, collision;
-    let attempts = 0;
-    do {
-        collision = false;
-        x = Math.random() * (window.innerWidth - 150) + 75;
-        y = Math.random() * (window.innerHeight - 300) + 100;
-        
-        // Mevcut objelerle çakışma kontrolü
-        document.querySelectorAll('.item').forEach(item => {
-            const dx = item.offsetLeft - x;
-            const dy = item.offsetTop - y;
-            if (Math.hypot(dx, dy) < 130) collision = true;
+// --- REKLAM KONTROLÜ (Her 250 parada bir) ---
+function checkAdThreshold() {
+    if (money - lastAdMoney >= 250) {
+        lastAdMoney = money;
+        showInterstitial();
+    }
+}
+
+function showInterstitial() {
+    if (ysdk) {
+        ysdk.adv.showFullscreenAdv({
+            callbacks: {
+                onOpen: () => { /* Oyunu duraklatabilirsin */ },
+                onClose: () => { console.log("Reklam bitti, devam!"); }
+            }
         });
-        attempts++;
-    } while (collision && attempts < 20);
-    return {x, y};
+    }
 }
 
-buyBtn.onclick = () => {
+// --- SATIN ALMA ---
+document.getElementById('buy-btn').onclick = () => {
     if (money >= 25) {
-        updateMoney(-25, 'lose');
-        const pos = getSafeSpawnPos();
-        createItem(1, pos.x, pos.y);
+        money -= 25;
+        sndBuy.play();
+        updateUI();
+        createItem(1, window.innerWidth/2, window.innerHeight/2);
     }
 };
 
 function createItem(lvl, x, y) {
     const el = document.createElement('div');
     el.className = 'item';
-    el.style.left = x + 'px';
-    el.style.top = y + 'px';
+    el.style.left = x + 'px'; el.style.top = y + 'px';
     el.style.backgroundImage = `url('assets/png${lvl}.png')`;
     el.dataset.lvl = lvl;
 
-    const levelTag = document.createElement('div');
-    levelTag.className = 'item-level';
-    levelTag.innerText = lvl;
-    el.appendChild(levelTag);
+    const tag = document.createElement('div');
+    tag.className = 'item-lvl'; tag.innerText = lvl;
+    el.appendChild(tag);
 
-    // Giriş Animasyonu
-    el.style.transform = 'translate(-50%, -50%) scale(0)';
-    setTimeout(() => el.style.transform = 'translate(-50%, -50%) scale(1)', 50);
-
-    addDragLogic(el);
-    canvas.appendChild(el);
+    addDrag(el);
+    document.getElementById('game-canvas').appendChild(el);
 }
 
-function addDragLogic(el) {
-    let dragging = false;
-    let offset = {x: 0, y: 0};
-
-    const start = (e) => {
-        dragging = true;
-        el.classList.add('dragging');
-        const p = e.type.includes('touch') ? e.touches[0] : e;
-        offset.x = p.clientX - el.offsetLeft;
-        offset.y = p.clientY - el.offsetTop;
-    };
-
+function addDrag(el) {
+    let dx = 0, dy = 0, dragging = false;
+    
     const move = (e) => {
         if (!dragging) return;
         const p = e.type.includes('touch') ? e.touches[0] : e;
-        el.style.left = (p.clientX - offset.x) + 'px';
-        el.style.top = (p.clientY - offset.y) + 'px';
+        el.style.left = (p.clientX - dx) + 'px';
+        el.style.top = (p.clientY - dy) + 'px';
     };
 
-    const end = () => {
-        if (!dragging) return;
+    const stop = () => {
         dragging = false;
         el.classList.remove('dragging');
-        checkCollision(el);
+        checkMerge(el);
+        window.removeEventListener('mousemove', move);
+        window.removeEventListener('mouseup', stop);
     };
 
-    el.onmousedown = start;
-    window.addEventListener('mousemove', move);
-    window.addEventListener('mouseup', end);
-    el.ontouchstart = start;
-    window.addEventListener('touchmove', move, {passive: false});
-    window.addEventListener('touchend', end);
+    el.onmousedown = (e) => {
+        dragging = true;
+        el.classList.add('dragging');
+        dx = e.clientX - el.offsetLeft;
+        dy = e.clientY - el.offsetTop;
+        window.addEventListener('mousemove', move);
+        window.addEventListener('mouseup', stop);
+    };
+
+    // Mobil için aynı mantık
+    el.ontouchstart = (e) => {
+        dragging = true;
+        el.classList.add('dragging');
+        dx = e.touches[0].clientX - el.offsetLeft;
+        dy = e.touches[0].clientY - el.offsetTop;
+        window.addEventListener('touchmove', move, {passive:false});
+        window.addEventListener('touchend', stop);
+    };
 }
 
-function checkCollision(dragged) {
+function checkMerge(dragged) {
     const items = document.querySelectorAll('.item');
-    let merged = false;
-
     items.forEach(other => {
-        if (other === dragged || merged) return;
-
+        if (other === dragged) return;
         const dist = Math.hypot(dragged.offsetLeft - other.offsetLeft, dragged.offsetTop - other.offsetTop);
-
-        // Birleşme mesafesi (120px obje için 100px ideal)
-        if (dist < 100 && dragged.dataset.lvl === other.dataset.lvl) {
-            const nextLvl = parseInt(dragged.dataset.lvl) + 1;
-            if (nextLvl <= 50) {
-                spawnParticles(other.offsetLeft, other.offsetTop);
-                createItem(nextLvl, other.offsetLeft, other.offsetTop);
+        
+        if (dist < 80 && dragged.dataset.lvl === other.dataset.lvl) {
+            const next = parseInt(dragged.dataset.lvl) + 1;
+            if (next <= 50) {
+                sndMerge.play();
+                createItem(next, other.offsetLeft, other.offsetTop);
                 dragged.remove();
                 other.remove();
-                updateMoney(nextLvl * 15, 'win');
-                merged = true;
             }
         }
     });
 }
-
-function spawnParticles(x, y) {
-    const icons = ['✨', '⭐', '🎈', '🎉'];
-    for (let i = 0; i < 8; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        p.innerText = icons[Math.floor(Math.random() * icons.length)];
-        p.style.left = x + 'px';
-        p.style.top = y + 'px';
-        p.style.setProperty('--dx', (Math.random() - 0.5) * 300 + 'px');
-        p.style.setProperty('--dy', (Math.random() - 0.5) * 300 + 'px');
-        canvas.appendChild(p);
-        setTimeout(() => p.remove(), 800);
-    }
-}
-
-updateMoney(0); // İlk kontrol
 </script>
 </body>
 </html>
