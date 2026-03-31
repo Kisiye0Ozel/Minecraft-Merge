@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -8,13 +8,7 @@
 <script src="https://yandex.ru/games/sdk/v2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-:root {
-  --mc-dirt:#7a5236; --mc-grass:#5d9e2f; --mc-stone:#7f7f7f;
-  --mc-gold:#ffdd00; --mc-diamond:#4ee9e9; --mc-emerald:#00e550;
-  --mc-sky:#72b4ff; --mc-sky2:#3e7fc9;
-  --mc-panel:#c6c6c6; --mc-dark:#3c3c3c; --mc-slot:#8b8b8b;
-  --mc-bl:#c6c6c6; --mc-bd:#373737;
-}
+:root{--mc-dirt:#7a5236;--mc-grass:#5d9e2f;--mc-stone:#7f7f7f;--mc-gold:#ffdd00;--mc-diamond:#4ee9e9;--mc-emerald:#00e550;--mc-sky:#72b4ff;--mc-sky2:#3e7fc9;--mc-panel:#c6c6c6;--mc-dark:#3c3c3c;--mc-slot:#8b8b8b;--mc-bl:#c6c6c6;--mc-bd:#373737;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;image-rendering:pixelated;image-rendering:crisp-edges;}
 html,body{overflow:hidden;width:100%;height:100%;font-family:'VT323',monospace;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;touch-action:none;color:#fff;background:#000;}
 *{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
@@ -30,10 +24,9 @@ html,body{overflow:hidden;width:100%;height:100%;font-family:'VT323',monospace;u
 #load-pct{font-size:20px;color:#fff;text-shadow:2px 2px 0 #000;letter-spacing:2px;}
 #load-status{font-size:clamp(15px,3.8vw,22px);color:#aaa;text-shadow:2px 2px 0 #000;letter-spacing:1px;min-height:26px;}
 #sky-layer{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 70px 70px at 82% 11%,#ffff88 0%,#ffdd00 45%,transparent 62%),linear-gradient(180deg,#1a3a8a 0%,#3e7fc9 38%,#72b4ff 62%,#aad4ff 76%,#c8e6ff 100%);}
-#cloud-canvas,#ground-canvas{position:absolute;inset:0;z-index:1;pointer-events:none;}
-#ground-canvas{bottom:0;height:90px;z-index:2;}
+#cloud-canvas{position:absolute;inset:0;z-index:1;pointer-events:none;}
+#ground-canvas{position:absolute;bottom:0;left:0;width:100%;height:90px;z-index:2;pointer-events:none;}
 .mc-panel-dark{background:rgba(0,0,0,0.72);border-top:3px solid #666;border-left:3px solid #666;border-right:3px solid #111;border-bottom:3px solid #111;}
-.mc-slot-inset{background:#8b8b8b;border-top:3px solid #373737;border-left:3px solid #373737;border-right:3px solid #fff;border-bottom:3px solid #fff;}
 #ui-top{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:min(92vw,500px);z-index:100;}
 .hud-box{padding:8px 18px 6px;text-align:center;margin-bottom:4px;}
 .hud-lbl{font-size:clamp(12px,2.5vw,16px);color:#aaa;text-shadow:1px 1px 0 #000;letter-spacing:3px;display:block;line-height:1;}
@@ -50,7 +43,6 @@ html,body{overflow:hidden;width:100%;height:100%;font-family:'VT323',monospace;u
 #tools{position:absolute;top:50%;left:8px;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:100;}
 .tool-btn{width:clamp(46px,11vw,60px);height:clamp(46px,11vw,60px);background:var(--mc-slot);border-top:3px solid var(--mc-bl);border-left:3px solid var(--mc-bl);border-right:3px solid var(--mc-bd);border-bottom:3px solid var(--mc-bd);font-size:clamp(20px,5vw,28px);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:filter .08s;}
 .tool-btn:active{border-top-color:var(--mc-bd);border-left-color:var(--mc-bd);border-right-color:var(--mc-bl);border-bottom-color:var(--mc-bl);filter:brightness(.85);}
-.tool-btn:hover{filter:brightness(1.15);}
 #music-on{display:block;}#music-off{display:none;}
 .tool-btn.muted #music-on{display:none;}.tool-btn.muted #music-off{display:block;}
 #lang-menu{display:none;position:absolute;top:50%;left:clamp(62px,15vw,80px);transform:translateY(-50%);background:var(--mc-dark);border-top:4px solid #666;border-left:4px solid #666;border-right:4px solid #111;border-bottom:4px solid #111;padding:8px;z-index:200;flex-direction:column;gap:4px;width:clamp(160px,40vw,220px);max-height:80vh;overflow-y:auto;}
@@ -58,26 +50,23 @@ html,body{overflow:hidden;width:100%;height:100%;font-family:'VT323',monospace;u
 .lang-opt:hover{background:rgba(255,255,255,0.1);}
 .lang-opt.active{color:var(--mc-gold);}
 #hotbar-wrap{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;gap:4px;}
-.hotbar-bg{display:flex;gap:3px;padding:5px;background:rgba(0,0,0,0.6);border-top:4px solid #8b8b8b;border-left:4px solid #8b8b8b;border-right:4px solid #111;border-bottom:4px solid #111;}
+.hotbar-bg{display:flex;gap:3px;padding:5px;background:rgba(0,0,0,0.6);border-top:4px solid #8b8b8b;border-left:4px solid #8b8b8b;border-right:4px solid #111;border-bottom:4px solid #111;flex-wrap:wrap;justify-content:center;max-width:100%;}
 .shop-card{display:flex;flex-direction:column;align-items:center;gap:3px;}
 .buy-btn{width:clamp(58px,14vw,82px);height:clamp(58px,14vw,82px);background:var(--mc-slot);border-top:3px solid var(--mc-bd);border-left:3px solid var(--mc-bd);border-right:3px solid #fff;border-bottom:3px solid #fff;cursor:pointer;position:relative;transition:filter .08s;display:flex;align-items:center;justify-content:center;font-size:clamp(26px,7vw,40px);}
 .buy-btn:active:not(:disabled){border-top-color:#fff;border-left-color:#fff;border-right-color:var(--mc-bd);border-bottom-color:var(--mc-bd);filter:brightness(.85);}
 .buy-btn:disabled{filter:brightness(.38);cursor:not-allowed;}
-.buy-btn:not(:disabled):hover{filter:brightness(1.18);}
 .slot-img{width:75%;height:75%;background-size:contain;background-repeat:no-repeat;background-position:center;}
 .price-tag{position:absolute;bottom:1px;right:3px;font-family:'VT323',monospace;font-size:clamp(12px,2.8vw,16px);color:#fff;text-shadow:1px 1px 0 #000,-1px -1px 0 #000;pointer-events:none;line-height:1;}
 .shop-label{font-family:'VT323',monospace;font-size:clamp(12px,2.8vw,17px);color:#fff;text-shadow:1px 1px 0 #000;letter-spacing:1px;}
-.ad-reward-label{font-family:'VT323',monospace;font-size:clamp(9px,2vw,12px);color:#ffdd00;text-shadow:1px 1px 0 #000;letter-spacing:1px;text-align:center;max-width:clamp(58px,14vw,82px);line-height:1.1;}
+.ad-reward-label{font-family:'VT323',monospace;font-size:clamp(9px,2vw,12px);color:#ffdd00;text-shadow:1px 1px 0 #000;letter-spacing:1px;text-align:center;max-width:clamp(58px,14vw,82px);line-height:1.1;white-space:nowrap;}
 .item{position:absolute;width:clamp(68px,15vw,100px);height:clamp(68px,15vw,100px);transform:translate(-50%,-50%);cursor:grab;z-index:5;}
-.item:active{cursor:grabbing;}
 .item-slot{width:100%;height:100%;background:var(--mc-slot);border-top:4px solid var(--mc-bd);border-left:4px solid var(--mc-bd);border-right:4px solid #fff;border-bottom:4px solid #fff;display:flex;align-items:center;justify-content:center;position:relative;transition:filter .1s;}
-.item:hover .item-slot{filter:brightness(1.2);}
 .item-img{width:78%;height:78%;background-size:contain;background-repeat:no-repeat;background-position:center;pointer-events:none;}
 .item-lvl{position:absolute;bottom:2px;right:3px;font-family:'VT323',monospace;font-size:clamp(13px,3.2vw,19px);color:#fff;text-shadow:1px 1px 0 #000,-1px -1px 0 #000,2px 2px 0 #000;pointer-events:none;line-height:1;}
-.rare {background:#5a3a8b;border-top-color:#8b55cc;border-left-color:#8b55cc;}
-.epic {background:#1a5a1a;border-top-color:#2f8c2f;border-left-color:#2f8c2f;}
+.rare{background:#5a3a8b;border-top-color:#8b55cc;border-left-color:#8b55cc;}
+.epic{background:#1a5a1a;border-top-color:#2f8c2f;border-left-color:#2f8c2f;}
 .legend{background:#7a5a00;border-top-color:#ffdd00;border-left-color:#ffdd00;}
-.god {background:#7a1a1a;border-top-color:#ff4444;border-left-color:#ff4444;}
+.god{background:#7a1a1a;border-top-color:#ff4444;border-left-color:#ff4444;}
 .float-text{position:absolute;pointer-events:none;font-family:'VT323',monospace;font-size:clamp(18px,4vw,26px);color:var(--mc-gold);text-shadow:2px 2px 0 #3d2e00,3px 3px 0 #000;letter-spacing:2px;z-index:999;animation:floatUp 1.1s ease-out forwards;}
 @keyframes floatUp{0%{opacity:1;transform:translate(-50%,0) scale(1);}100%{opacity:0;transform:translate(-50%,-70px) scale(1.2);}}
 .merge-burst{position:absolute;pointer-events:none;width:72px;height:72px;transform:translate(-50%,-50%);animation:mcBurst .5s steps(5) forwards;z-index:50;}
@@ -86,8 +75,6 @@ html,body{overflow:hidden;width:100%;height:100%;font-family:'VT323',monospace;u
 @keyframes sparkFly{0%{opacity:1;transform:translate(0,0);}100%{opacity:0;transform:translate(var(--sx),var(--sy));}}
 #ach-banner{display:none;position:fixed;top:16px;right:12px;z-index:1000;min-width:200px;max-width:280px;padding:9px 13px;background:rgba(0,0,0,0.8);border-top:3px solid #888;border-left:3px solid #888;border-right:3px solid #222;border-bottom:3px solid #222;animation:achSlide .4s cubic-bezier(.22,1,.36,1) forwards;}
 @keyframes achSlide{from{transform:translateX(130%);opacity:0;}to{transform:translateX(0);opacity:1;}}
-#ach-banner .ah{font-size:13px;color:var(--mc-gold);text-shadow:1px 1px 0 #000;letter-spacing:2px;display:block;margin-bottom:2px;}
-#ach-banner .ab{font-size:clamp(16px,4vw,22px);color:#fff;text-shadow:2px 2px 0 #000;display:block;}
 #tut-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.84);align-items:center;justify-content:center;}
 .tut-box{background:var(--mc-dark);border-top:4px solid #888;border-left:4px solid #888;border-right:4px solid #111;border-bottom:4px solid #111;padding:clamp(14px,4vw,26px);max-width:min(88vw,420px);width:100%;text-align:center;}
 .tut-box h2{font-family:'VT323',monospace;font-size:clamp(24px,6vw,36px);color:var(--mc-gold);text-shadow:3px 3px 0 #3d2e00;letter-spacing:2px;margin-bottom:12px;}
@@ -97,7 +84,7 @@ html,body{overflow:hidden;width:100%;height:100%;font-family:'VT323',monospace;u
 .mc-green-btn:active{border-top-color:#143209;border-left-color:#143209;border-right-color:#5dde5d;border-bottom-color:#5dde5d;filter:brightness(.85);}
 #toast{display:none;position:fixed;bottom:125px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.82);border-top:3px solid #888;border-left:3px solid #888;border-right:3px solid #222;border-bottom:3px solid #222;font-family:'VT323',monospace;font-size:clamp(16px,4vw,24px);color:var(--mc-gold);text-shadow:2px 2px 0 #000;padding:8px 18px;z-index:800;letter-spacing:2px;white-space:nowrap;}
 @media(max-height:600px){#ui-top{top:4px;}#hotbar-wrap{bottom:4px;}.buy-btn{width:52px;height:52px;}}
-@media(orientation:portrait){#tools{top:auto;bottom:calc(clamp(58px,14vw,82px)*2 + 40px);transform:none;left:8px;flex-direction:row;flex-wrap:wrap;width:clamp(100px,24vw,130px);}}
+@media(orientation:portrait){#tools{top:auto;bottom:calc(clamp(58px,14vw,82px)*2 + 40px);transform:none;left:8px;flex-direction:row;flex-wrap:wrap;width:clamp(100px,24vw,130px);}#lang-menu{left:8px;top:auto;bottom:calc(clamp(58px,14vw,82px)*2 + 100px);transform:none;}}
 </style>
 </head>
 <body>
@@ -198,12 +185,7 @@ function sfxCoin(){if(!audioCtx||musicMuted)return;playNote(N.G5,audioCtx.curren
 document.addEventListener('visibilitychange',()=>{isPageVisible=!document.hidden;if(document.hidden){wasPlayingBeforeHide=musicPlaying;stopMusic();if(audioCtx&&audioCtx.state==='running')audioCtx.suspend();}else{if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();if(wasPlayingBeforeHide&&!musicMuted)startMusic();}});
 window.addEventListener('blur',()=>{wasPlayingBeforeHide=musicPlaying;stopMusic();});
 window.addEventListener('focus',()=>{if(wasPlayingBeforeHide&&!musicMuted&&isPageVisible)startMusic();});
-const LANGS={
-  tr:{load0:'Dünya Oluşturuluyor...',load1:'Çiftlikler Yükleniyor...',load2:'Koyunlar Sayılıyor...',load3:'Oyun Hazır!',play:'▶ OYNAMAYA BAŞLA!',howto:'⛏ Nasıl Oynanır?',t1:'Alttaki slottan obje satın al!',t2:'Aynı objeleri sürükle ve birleştir!',t3:'Objeler saniyede altın üretir!',t4:'Reklam izle, 2X kazanç kazan!',goal:'HEDEF',ps:'/s',gift:'HEDİYE',turbo:'2X HIZ',ad_watch:'📺 Reklam İzle',gift_ad:'📺 +1 Obje',turbo_ad:'📺 2X Hız',saved:'💾 Kaydedildi!',new_lvl:'YENİ SEVİYE AÇILDI!',turbo_on:'⚡ TURBO MOD BAŞLADI!',reward:'🎁 +1 Obje Verildi!',money_lbl:'ALTIN',ms:['İlk Birleştirme! 🎉','10 Birleştirme! 🌟','Usta Oyuncu! 👑','EFSANEVİ! 🔥']},
-  en:{load0:'Generating World...',load1:'Loading Biomes...',load2:'Counting Sheep...',load3:'Game Ready!',play:'▶ START PLAYING!',howto:'⛏ How to Play?',t1:'Buy items from the shop!',t2:'Drag identical items to merge them!',t3:'Items produce gold every second!',t4:'Watch an ad for 2X income!',goal:'GOAL',ps:'/s',gift:'GIFT',turbo:'2X SPEED',ad_watch:'📺 Watch Ad',gift_ad:'📺 +1 Item',turbo_ad:'📺 2X Speed',saved:'💾 Saved!',new_lvl:'NEW LEVEL UNLOCKED!',turbo_on:'⚡ TURBO MODE START!',reward:'🎁 +1 Item Received!',money_lbl:'GOLD',ms:['First Merge! 🎉','10 Merges! 🌟','Master Player! 👑','LEGENDARY! 🔥']},
-  ru:{load0:'Генерация мира...',load1:'Загрузка биомов...',load2:'Считаем овец...',load3:'Игра готова!',play:'▶ НАЧАТЬ ИГРУ!',howto:'⛏ Как играть?',t1:'Покупай предметы внизу!',t2:'Перетаскивай одинаковые предметы!',t3:'Предметы зарабатывают золото!',t4:'Смотри рекламу — 2X доход!',goal:'ЦЕЛЬ',ps:'/с',gift:'ПОДАРОК',turbo:'2X СКОР.',ad_watch:'📺 Смотреть рекламу',gift_ad:'📺 +1 Предмет',turbo_ad:'📺 2X СКОР.',saved:'💾 Сохранено!',new_lvl:'НОВЫЙ УРОВЕНЬ!',turbo_on:'⚡ ТУРБО РЕЖИМ!',reward:'🎁 +1 Предмет!',money_lbl:'ЗОЛОТО',ms:['Первое слияние! 🎉','10 слияний! 🌟','Мастер! 👑','ЛЕГЕНДА! 🔥']},
-  de:{load0:'Welt wird generiert...',load1:'Biome werden geladen...',load2:'Schafe werden gezählt...',load3:'Spiel bereit!',play:'▶ SPIELEN!',howto:'⛏ Wie spielt man?',t1:'Kaufe Gegenstände unten!',t2:'Ziehe gleiche Objekte aufeinander!',t3:'Objekte erzeugen Gold pro Sekunde!',t4:'Werbung ansehen = 2X Gold!',goal:'ZIEL',ps:'/s',gift:'GESCHENK',turbo:'2X TEMPO',ad_watch:'📺 Werbung ansehen',gift_ad:'📺 +1 Objekt',turbo_ad:'📺 2X TEMPO',saved:'💾 Gespeichert!',new_lvl:'NEUES LEVEL!',turbo_on:'⚡ TURBO MODUS!',reward:'🎁 +1 Objekt!',money_lbl:'GOLD',ms:['Erste Fusion! 🎉','10 Fusionen! 🌟','Meister! 👑','LEGENDÄR! 🔥']}
-};
+const LANGS={tr:{load0:'Dünya Oluşturuluyor...',load1:'Çiftlikler Yükleniyor...',load2:'Koyunlar Sayılıyor...',load3:'Oyun Hazır!',play:'▶ OYNAMAYA BAŞLA!',howto:'⛏ Nasıl Oynanır?',t1:'Alttaki slottan obje satın al!',t2:'Aynı objeleri sürükle ve birleştir!',t3:'Objeler saniyede altın üretir!',t4:'Reklam izle, 2X kazanç kazan!',goal:'HEDEF',ps:'/s',gift:'HEDİYE',turbo:'2X HIZ',gift_ad:'📺 +1 Obje',turbo_ad:'📺 2X Hız',saved:'💾 Kaydedildi!',new_lvl:'YENİ SEVİYE AÇILDI!',turbo_on:'⚡ TURBO MOD BAŞLADI!',reward:'🎁 +1 Obje Verildi!',money_lbl:'ALTIN',ms:['İlk Birleştirme! 🎉','10 Birleştirme! 🌟','Usta Oyuncu! 👑','EFSANEVİ! 🔥']},en:{load0:'Generating World...',load1:'Loading Biomes...',load2:'Counting Sheep...',load3:'Game Ready!',play:'▶ START PLAYING!',howto:'⛏ How to Play?',t1:'Buy items from the shop!',t2:'Drag identical items to merge them!',t3:'Items produce gold every second!',t4:'Watch an ad for 2X income!',goal:'GOAL',ps:'/s',gift:'GIFT',turbo:'2X SPEED',gift_ad:'📺 +1 Item',turbo_ad:'📺 2X Speed',saved:'💾 Saved!',new_lvl:'NEW LEVEL UNLOCKED!',turbo_on:'⚡ TURBO MODE START!',reward:'🎁 +1 Item Received!',money_lbl:'GOLD',ms:['First Merge! 🎉','10 Merges! 🌟','Master Player! 👑','LEGENDARY! 🔥']},ru:{load0:'Генерация мира...',load1:'Загрузка биомов...',load2:'Считаем овец...',load3:'Игра готова!',play:'▶ НАЧАТЬ ИГРУ!',howto:'⛏ Как играть?',t1:'Покупай предметы внизу!',t2:'Перетаскивай одинаковые предметы!',t3:'Предметы зарабатывают золото!',t4:'Смотри рекламу — 2X доход!',goal:'ЦЕЛЬ',ps:'/с',gift:'ПОДАРОК',turbo:'2X СКОР.',gift_ad:'📺 +1 Предмет',turbo_ad:'📺 2X СКОР.',saved:'💾 Сохранено!',new_lvl:'НОВЫЙ УРОВЕНЬ!',turbo_on:'⚡ ТУРБО РЕЖИМ!',reward:'🎁 +1 Предмет!',money_lbl:'ЗОЛОТО',ms:['Первое слияние! 🎉','10 слияний! 🌟','Мастер! 👑','ЛЕГЕНДА! 🔥']},de:{load0:'Welt wird generiert...',load1:'Biome werden geladen...',load2:'Schafe werden gezählt...',load3:'Spiel bereit!',play:'▶ SPIELEN!',howto:'⛏ Wie spielt man?',t1:'Kaufe Gegenstände unten!',t2:'Ziehe gleiche Objekte aufeinander!',t3:'Objekte erzeugen Gold pro Sekunde!',t4:'Werbung ansehen = 2X Gold!',goal:'ZIEL',ps:'/s',gift:'GESCHENK',turbo:'2X TEMPO',gift_ad:'📺 +1 Objekt',turbo_ad:'📺 2X TEMPO',saved:'💾 Gespeichert!',new_lvl:'NEUES LEVEL!',turbo_on:'⚡ TURBO MODUS!',reward:'🎁 +1 Objekt!',money_lbl:'GOLD',ms:['Erste Fusion! 🎉','10 Fusionen! 🌟','Meister! 👑','LEGENDÄR! 🔥']}};
 let lang='tr';const T=()=>LANGS[lang];
 function detectLang(sdk){try{const env=sdk.environment;const sdkLang=(env&&env.i18n&&env.i18n.lang)||navigator.language||'tr';const code=sdkLang.split('-')[0].toLowerCase();if(LANGS[code])return code;const map={uk:'ru',be:'ru',kk:'ru',az:'ru',uz:'ru'};return map[code]||'en';}catch(e){return 'tr';}}
 let money=150,maxLvl=1,turboTime=0,turboMax=120,ysdk=null,totalMerges=0,milestoneShown=[false,false,false,false],langMenuOpen=false,incomePerSec=0,gameReady=false;
@@ -216,131 +198,27 @@ function closeTutorial(){document.getElementById('tut-overlay').style.display='n
 function setLang(l){lang=l;langMenuOpen=false;document.getElementById('lang-menu').style.display='none';document.querySelectorAll('.lang-opt').forEach(e=>e.classList.toggle('active',e.dataset.lang===l));document.documentElement.lang=l;applyTrans();saveGame();}
 function toggleLangMenu(){langMenuOpen=!langMenuOpen;document.getElementById('lang-menu').style.display=langMenuOpen?'flex':'none';}
 document.addEventListener('click',e=>{if(langMenuOpen&&!e.target.closest('#lang-menu')&&!e.target.closest('#tools')){langMenuOpen=false;document.getElementById('lang-menu').style.display='none';}});
-function applyTrans(){
-  document.getElementById('lbl-gift').textContent=T().gift;
-  document.getElementById('lbl-gift-ad').textContent=T().gift_ad;
-  document.getElementById('lbl-turbo').textContent=T().turbo;
-  document.getElementById('lbl-turbo-ad').textContent=T().turbo_ad;
-  document.getElementById('goal-lbl').textContent=T().goal;
-  document.getElementById('money-lbl').textContent=T().money_lbl;
-  document.getElementById('xp-lbl').textContent='🔥 '+T().turbo_on;
-  document.querySelectorAll('.lang-opt').forEach(e=>e.classList.toggle('active',e.dataset.lang===lang));
-  updateUI();
-}
+function applyTrans(){document.getElementById('lbl-gift').textContent=T().gift;document.getElementById('lbl-gift-ad').textContent=T().gift_ad;document.getElementById('lbl-turbo').textContent=T().turbo;document.getElementById('lbl-turbo-ad').textContent=T().turbo_ad;document.getElementById('goal-lbl').textContent=T().goal;document.getElementById('money-lbl').textContent=T().money_lbl;document.getElementById('xp-lbl').textContent='🔥 '+T().turbo_on;document.querySelectorAll('.lang-opt').forEach(e=>e.classList.toggle('active',e.dataset.lang===lang));updateUI();}
 setInterval(()=>{incomePerSec=0;document.querySelectorAll('.item').forEach(i=>incomePerSec+=Math.pow(parseInt(i.dataset.lvl),1.6));let inc=incomePerSec;if(turboTime>0){inc*=2;turboTime--;const p=(turboTime/turboMax)*100;document.getElementById('xp-bar').style.width=p+'%';document.getElementById('xp-wrap').style.display='block';document.getElementById('xp-lbl').style.display='block';if(turboTime===0){document.getElementById('xp-wrap').style.display='none';document.getElementById('xp-lbl').style.display='none';}}money+=Math.floor(inc);if(Math.floor(inc)>0&&Math.random()<.08)sfxCoin();updateUI();if(Math.random()<.04)saveGame();},1000);
 function fmt(n){if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return Math.floor(n)+'';}
-function updateUI(){
-  document.getElementById('m-val').textContent=fmt(money);
-  const ips=turboTime>0?Math.floor(incomePerSec*2):Math.floor(incomePerSec);
-  document.getElementById('inc-val').textContent=fmt(ips)+T().ps;
-  document.getElementById('btn-1').disabled=money<25;
-  if(maxLvl>=3){
-    const dl=Math.max(1,maxLvl-2),dp=getPrice(dl)*2;
-    document.getElementById('dyn-slot').style.display='flex';
-    document.getElementById('si-dyn').style.backgroundImage=`url('assets/png${dl}.png')`;
-    document.getElementById('p-dyn').textContent=fmt(dp);
-    document.getElementById('txt-dyn').textContent='PNG '+dl;
-    document.getElementById('btn-dyn').onclick=()=>{if(money>=dp){money-=dp;createItem(dl,sx(),sy());sfxBuy();updateUI();}};
-    document.getElementById('btn-dyn').disabled=money<dp;
-  }
-  document.getElementById('goal-item').textContent=`PNG ${maxLvl+1} ⛏`;
-  document.getElementById('goal-rew').textContent=`+${fmt(getPrice(maxLvl+1)*3)} 💰`;
-}
+function updateUI(){document.getElementById('m-val').textContent=fmt(money);const ips=turboTime>0?Math.floor(incomePerSec*2):Math.floor(incomePerSec);document.getElementById('inc-val').textContent=fmt(ips)+T().ps;document.getElementById('btn-1').disabled=money<25;if(maxLvl>=3){const dl=Math.max(1,maxLvl-2),dp=getPrice(dl)*2;document.getElementById('dyn-slot').style.display='flex';document.getElementById('si-dyn').style.backgroundImage=`url('assets/png${dl}.png')`;document.getElementById('p-dyn').textContent=fmt(dp);document.getElementById('txt-dyn').textContent='PNG '+dl;document.getElementById('btn-dyn').onclick=()=>{if(money>=dp){money-=dp;createItem(dl,sx(),sy());sfxBuy();updateUI();}};document.getElementById('btn-dyn').disabled=money<dp;}document.getElementById('goal-item').textContent=`PNG ${maxLvl+1} ⛏`;document.getElementById('goal-rew').textContent=`+${fmt(getPrice(maxLvl+1)*3)} 💰`;}
 function sx(){return window.innerWidth*(0.2+Math.random()*.6);}
 function sy(){return window.innerHeight*(0.18+Math.random()*.35)+55;}
-function createItem(lvl,x,y){
-  lvl=parseInt(lvl);
-  const el=document.createElement('div');el.className='item';
-  const hw=clamp(68,15,100)/2;
-  x=Math.max(hw,Math.min(window.innerWidth-hw,x));
-  y=Math.max(hw,Math.min(window.innerHeight*.82,y));
-  el.style.left=x+'px';el.style.top=y+'px';el.dataset.lvl=lvl;
-  const rc=rarityClass(lvl);
-  el.innerHTML=`<div class="item-slot ${rc}"><div class="item-img" style="background-image:url('assets/png${lvl}.png')"></div><div class="item-lvl">${lvl}</div></div>`;
-  el.style.transform='translate(-50%,-50%) scale(0)';
-  el.style.transition='transform .25s cubic-bezier(.34,1.56,.64,1)';
-  requestAnimationFrame(()=>{el.style.transform='translate(-50%,-50%) scale(1)';});
-  makeDraggable(el);
-  document.getElementById('game-canvas').appendChild(el);
-}
+function createItem(lvl,x,y){lvl=parseInt(lvl);const el=document.createElement('div');el.className='item';const hw=clamp(68,15,100)/2;x=Math.max(hw,Math.min(window.innerWidth-hw,x));y=Math.max(hw,Math.min(window.innerHeight*.82,y));el.style.left=x+'px';el.style.top=y+'px';el.dataset.lvl=lvl;const rc=rarityClass(lvl);el.innerHTML=`<div class="item-slot ${rc}"><div class="item-img" style="background-image:url('assets/png${lvl}.png')"></div><div class="item-lvl">${lvl}</div></div>`;el.style.transform='translate(-50%,-50%) scale(0)';el.style.transition='transform .25s cubic-bezier(.34,1.56,.64,1)';requestAnimationFrame(()=>{el.style.transform='translate(-50%,-50%) scale(1)';});makeDraggable(el);document.getElementById('game-canvas').appendChild(el);}
 function clamp(base,vwPct,max){return Math.max(base,Math.min(max,window.innerWidth*(vwPct/100)));}
-function makeDraggable(el){
-  let dx,dy,drag=false;
-  const start=e=>{e.preventDefault();drag=true;el.style.zIndex=1000;el.style.transition='none';initAudio();const p=e.touches?e.touches[0]:e;dx=p.clientX-el.offsetLeft;dy=p.clientY-el.offsetTop;};
-  const move=e=>{if(!drag)return;e.preventDefault();const p=e.touches?e.touches[0]:e;const hw=el.offsetWidth/2,hh=el.offsetHeight/2;el.style.left=Math.max(hw,Math.min(window.innerWidth-hw,p.clientX-dx))+'px';el.style.top=Math.max(hh,Math.min(window.innerHeight*.82,p.clientY-dy))+'px';};
-  const stop=()=>{if(!drag)return;drag=false;el.style.zIndex=5;checkMerge(el);};
-  el.addEventListener('mousedown',start,{passive:false});
-  el.addEventListener('touchstart',start,{passive:false});
-  el.addEventListener('contextmenu',e=>e.preventDefault());
-  window.addEventListener('mousemove',move,{passive:false});
-  window.addEventListener('touchmove',move,{passive:false});
-  window.addEventListener('mouseup',stop);
-  window.addEventListener('touchend',stop);
-}
-function checkMerge(dragged){
-  let merged=false;
-  document.querySelectorAll('.item').forEach(other=>{
-    if(other===dragged||merged)return;
-    const d=Math.hypot(dragged.offsetLeft-other.offsetLeft,dragged.offsetTop-other.offsetTop);
-    if(d<74&&dragged.dataset.lvl===other.dataset.lvl){
-      merged=true;
-      const next=parseInt(dragged.dataset.lvl)+1;
-      const mx=other.offsetLeft,my=other.offsetTop;
-      spawnBurst(mx,my,next);spawnSparks(mx,my);showFloat(mx,my,'LVL '+next+'!');
-      dragged.remove();other.remove();
-      createItem(next,mx,my);
-      if(next>maxLvl){
-        maxLvl=next;sfxLevelUp();showAch(next);
-        if(next%5===0&&ysdk){
-          pauseMusicForAd();
-          ysdk.adv.showFullscreenAdv({callbacks:{onClose:()=>resumeMusicAfterAd(),onError:()=>resumeMusicAfterAd()}});
-        }
-      } else {sfxMerge(next);}
-      totalMerges++;
-      checkMilestone();
-      updateUI();
-    }
-  });
-}
+function makeDraggable(el){let dx,dy,drag=false;const start=e=>{e.preventDefault();drag=true;el.style.zIndex=1000;el.style.transition='none';initAudio();const p=e.touches?e.touches[0]:e;dx=p.clientX-el.offsetLeft;dy=p.clientY-el.offsetTop;};const move=e=>{if(!drag)return;e.preventDefault();const p=e.touches?e.touches[0]:e;const hw=el.offsetWidth/2,hh=el.offsetHeight/2;el.style.left=Math.max(hw,Math.min(window.innerWidth-hw,p.clientX-dx))+'px';el.style.top=Math.max(hh,Math.min(window.innerHeight*.82,p.clientY-dy))+'px';};const stop=()=>{if(!drag)return;drag=false;el.style.zIndex=5;checkMerge(el);};el.addEventListener('mousedown',start,{passive:false});el.addEventListener('touchstart',start,{passive:false});el.addEventListener('contextmenu',e=>e.preventDefault());window.addEventListener('mousemove',move,{passive:false});window.addEventListener('touchmove',move,{passive:false});window.addEventListener('mouseup',stop);window.addEventListener('touchend',stop);}
+function checkMerge(dragged){let merged=false;document.querySelectorAll('.item').forEach(other=>{if(other===dragged||merged)return;const d=Math.hypot(dragged.offsetLeft-other.offsetLeft,dragged.offsetTop-other.offsetTop);if(d<74&&dragged.dataset.lvl===other.dataset.lvl){merged=true;const next=parseInt(dragged.dataset.lvl)+1;const mx=other.offsetLeft,my=other.offsetTop;spawnBurst(mx,my,next);spawnSparks(mx,my);showFloat(mx,my,'LVL '+next+'!');dragged.remove();other.remove();createItem(next,mx,my);if(next>maxLvl){maxLvl=next;sfxLevelUp();showAch(next);if(next%5===0&&ysdk){pauseMusicForAd();ysdk.adv.showFullscreenAdv({callbacks:{onClose:()=>resumeMusicAfterAd(),onError:()=>resumeMusicAfterAd()}});}}else{sfxMerge(next);}totalMerges++;checkMilestone();updateUI();}});}
 function spawnBurst(x,y,lvl){const b=document.createElement('div');b.className='merge-burst';b.style.left=x+'px';b.style.top=y+'px';const cols=['#fff','#5dde5d','#4ee9e9','#b06aff','#ffdd00','#ff4444'];b.style.background=cols[Math.min(lvl-1,cols.length-1)];b.style.opacity='.85';document.getElementById('game-canvas').appendChild(b);setTimeout(()=>b.remove(),600);}
 function spawnSparks(cx,cy){for(let i=0;i<8;i++){const s=document.createElement('div');s.className='px-spark';const a=(i/8)*Math.PI*2,dist=28+Math.random()*38;s.style.setProperty('--sx',(Math.cos(a)*dist)+'px');s.style.setProperty('--sy',(Math.sin(a)*dist)+'px');s.style.left=cx+'px';s.style.top=cy+'px';s.style.background=['#ffdd00','#5dde5d','#4ee9e9','#fff'][Math.floor(Math.random()*4)];document.getElementById('game-canvas').appendChild(s);setTimeout(()=>s.remove(),850);}}
 function showFloat(x,y,txt){const el=document.createElement('div');el.className='float-text';el.textContent=txt;el.style.left=x+'px';el.style.top=y+'px';document.getElementById('game-canvas').appendChild(el);setTimeout(()=>el.remove(),1100);}
 function showAch(lvl){const b=document.getElementById('ach-banner');document.getElementById('ah-top').textContent=T().new_lvl;document.getElementById('ah-body').textContent='PNG '+lvl+' ✅';b.style.display='block';b.style.animation='none';requestAnimationFrame(()=>{b.style.animation='achSlide .4s cubic-bezier(.22,1,.36,1) forwards';});setTimeout(()=>{b.style.display='none';},3000);}
 function checkMilestone(){[1,10,25,50].forEach((t,i)=>{if(!milestoneShown[i]&&totalMerges>=t){milestoneShown[i]=true;showToast(T().ms[i]);}});}
 function buy(lvl){const c=getPrice(lvl);if(money>=c){money-=c;createItem(lvl,sx(),sy());sfxBuy();updateUI();}}
-function saveGame(){
-  const items=[];document.querySelectorAll('.item').forEach(i=>items.push({l:i.dataset.lvl,x:parseFloat(i.style.left),y:parseFloat(i.style.top)}));
-  const data={money,maxLvl,items,lang,totalMerges,milestoneShown};
-  try{localStorage.setItem('mct_v3',JSON.stringify(data));}catch(e){}
-  showToast(T().saved);
-  if(ysdk)ysdk.getPlayer().then(p=>p.setData({s:data})).catch(()=>{});
-}
-function loadGame(){
-  const apply=d=>{if(!d)return firstTime();money=d.money||150;maxLvl=d.maxLvl||1;lang=d.lang||lang;totalMerges=d.totalMerges||0;milestoneShown=d.milestoneShown||[false,false,false,false];if(d.items)d.items.forEach(i=>createItem(i.l,i.x,i.y));applyTrans();};
-  let local=null;try{local=JSON.parse(localStorage.getItem('mct_v3'));}catch(e){}
-  if(ysdk){ysdk.getPlayer({scopes:false}).then(p=>p.getData(['s'])).then(d=>{apply(d&&d.s?d.s:local);}).catch(()=>apply(local));}else{apply(local);}
-}
+function saveGame(){const items=[];document.querySelectorAll('.item').forEach(i=>items.push({l:i.dataset.lvl,x:parseFloat(i.style.left),y:parseFloat(i.style.top)}));const data={money,maxLvl,items,lang,totalMerges,milestoneShown};try{localStorage.setItem('mct_v3',JSON.stringify(data));}catch(e){}showToast(T().saved);if(ysdk)ysdk.getPlayer().then(p=>p.setData({s:data})).catch(()=>{});}
+function loadGame(){const apply=d=>{if(!d)return firstTime();money=d.money||150;maxLvl=d.maxLvl||1;lang=d.lang||lang;totalMerges=d.totalMerges||0;milestoneShown=d.milestoneShown||[false,false,false,false];if(d.items)d.items.forEach(i=>createItem(i.l,i.x,i.y));applyTrans();};let local=null;try{local=JSON.parse(localStorage.getItem('mct_v3'));}catch(e){}if(ysdk){ysdk.getPlayer({scopes:false}).then(p=>p.getData(['s'])).then(d=>{apply(d&&d.s?d.s:local);}).catch(()=>apply(local));}else{apply(local);}}
 function firstTime(){createItem(1,sx(),sy());createItem(1,sx(),sy());applyTrans();showTutorial();}
-function watchTurbo(){
-  initAudio();
-  if(ysdk){
-    pauseMusicForAd();
-    ysdk.adv.showRewardedVideo({callbacks:{
-      onOpen:()=>{},onClose:()=>resumeMusicAfterAd(),onError:()=>resumeMusicAfterAd(),
-      onRewarded:()=>{turboTime+=turboMax;showToast(T().turbo_on);}
-    }});
-  } else {turboTime+=60;showToast(T().turbo_on);}
-}
-function watchGift(){
-  initAudio();
-  if(ysdk){
-    pauseMusicForAd();
-    ysdk.adv.showRewardedVideo({callbacks:{
-      onOpen:()=>{},onClose:()=>resumeMusicAfterAd(),onError:()=>resumeMusicAfterAd(),
-      onRewarded:()=>{createItem(Math.max(1,maxLvl-1),sx(),sy());showToast(T().reward);}
-    }});
-  } else {createItem(Math.max(1,maxLvl-1),sx(),sy());showToast(T().reward);}
-}
+function watchTurbo(){initAudio();if(ysdk){pauseMusicForAd();ysdk.adv.showRewardedVideo({callbacks:{onOpen:()=>{},onClose:()=>resumeMusicAfterAd(),onError:()=>resumeMusicAfterAd(),onRewarded:()=>{turboTime+=turboMax;showToast(T().turbo_on);}}});}else{turboTime+=60;showToast(T().turbo_on);}}
+function watchGift(){initAudio();if(ysdk){pauseMusicForAd();ysdk.adv.showRewardedVideo({callbacks:{onOpen:()=>{},onClose:()=>resumeMusicAfterAd(),onError:()=>resumeMusicAfterAd(),onRewarded:()=>{createItem(Math.max(1,maxLvl-1),sx(),sy());showToast(T().reward);}}});}else{createItem(Math.max(1,maxLvl-1),sx(),sy());showToast(T().reward);}}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>{t.style.display='none';},2200);}
 ['touchstart','mousedown'].forEach(ev=>document.addEventListener(ev,()=>{initAudio();if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();},{once:true}));
 function drawClouds(){const cv=document.getElementById('cloud-canvas');cv.width=window.innerWidth;cv.height=window.innerHeight;const ctx=cv.getContext('2d');ctx.imageSmoothingEnabled=false;const cs=[{x:.08,y:.07},{x:.33,y:.04},{x:.58,y:.09},{x:.78,y:.05}];const bs=18;cs.forEach(c=>{const cx=c.x*cv.width,cy=c.y*cv.height;ctx.fillStyle='rgba(255,255,255,0.9)';[{dx:0,dy:1},{dx:1,dy:0},{dx:1,dy:1},{dx:2,dy:1},{dx:3,dy:1},{dx:3,dy:0},{dx:4,dy:1},{dx:1,dy:2},{dx:2,dy:2},{dx:3,dy:2}].forEach(b=>ctx.fillRect(cx+b.dx*bs,cy+b.dy*bs,bs-1,bs-1));});}
@@ -355,4 +233,4 @@ YaGames.init().then(sdk=>{ysdk=sdk;lang=detectLang(sdk);runLoading(()=>{drawClou
 </script>
 </body>
 </html>
-
+```
