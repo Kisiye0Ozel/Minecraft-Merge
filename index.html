@@ -1646,11 +1646,11 @@ function updateUI() {
 }
 
 function centerX() {
-  return window.innerWidth / 2 + (Math.random() - 0.5) * 150;
+  return window.innerWidth / 2 + (Math.random() - 0.5) * 100;
 }
 
 function centerY() {
-  return window.innerHeight / 2 + (Math.random() - 0.5) * 150;
+  return window.innerHeight / 2 + (Math.random() - 0.5) * 100;
 }
 
 function sx() {
@@ -1667,33 +1667,48 @@ async function createItem(lvl, x, y) {
   const el = document.createElement('div');
   el.className = 'item';
   
-  const itemSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--item-size')) / 2;
-  x = Math.max(itemSize, Math.min(window.innerWidth - itemSize, x));
-  y = Math.max(itemSize, Math.min(window.innerHeight * .82, y));
+  // ÖNEMLİ: Eğer x veya y boş gelirse (satın alma/hediye gibi) merkeze ata
+  if (x === undefined || isNaN(x)) x = centerX();
+  if (y === undefined || isNaN(y)) y = centerY();
+
+  // CSS'deki clamp() değeri JavaScript'te NaN döndürdüğü için sabit bir güvenli değer kullanıyoruz
+  const safeMargin = 40; 
+  x = Math.max(safeMargin, Math.min(window.innerWidth - safeMargin, x));
+  y = Math.max(safeMargin, Math.min(window.innerHeight * 0.82, y));
   
+  // Koordinatları px olarak ata
   el.style.left = x + 'px';
   el.style.top = y + 'px';
   el.dataset.lvl = lvl;
   
   const rc = rarityClass(lvl);
   
-  // Asset yükleme
+  // Asset yükleme işlemi
   const assetName = `png${lvl}`;
   const assetUrl = await loadAsset(assetName);
-  
   const bgImage = assetUrl ? `url('${assetUrl}')` : 'none';
   
-  el.innerHTML = `<div class="item-slot ${rc}"><div class="item-img" style="background-image: ${bgImage}"></div><div class="item-lvl">${lvl}</div></div>`;
+  // İçerik yapısı
+  el.innerHTML = `
+    <div class="item-slot ${rc}">
+      <div class="item-img" style="background-image: ${bgImage}"></div>
+      <div class="item-lvl">${lvl}</div>
+    </div>`;
   
+  // Animasyon ayarları: Merkezden büyüyerek çıkması için (-50%, -50%)
   el.style.transform = 'translate(-50%,-50%) scale(0)';
   el.style.transition = 'transform .25s cubic-bezier(.34,1.56,.64,1)';
   
+  // DOM'a ekle
+  document.getElementById('game-canvas').appendChild(el);
+
+  // Animasyonu başlat
   requestAnimationFrame(() => {
     el.style.transform = 'translate(-50%,-50%) scale(1)';
   });
   
+  // Sürükleme özelliğini aktif et
   makeDraggable(el);
-  document.getElementById('game-canvas').appendChild(el);
 }
 
 function makeDraggable(el) {
@@ -1839,7 +1854,8 @@ function buy(lvl) {
   const c = getPrice(lvl);
   if (money >= c) {
     money -= c;
-    createItem(lvl, centerX(), centerY());
+    // Koordinat göndermiyoruz, createItem kendi merkezini hesaplayacak
+    createItem(lvl); 
     sfxBuy();
     updateUI();
   }
@@ -1929,7 +1945,7 @@ function watchTurbo() {
 
 function watchGift() {
   initAudio();
-  if (ysdk) {
+  if (typeof ysdk !== 'undefined') {
     pauseMusicForAd();
     ysdk.adv.showRewardedVideo({
       callbacks: {
@@ -1937,16 +1953,17 @@ function watchGift() {
         onClose: () => resumeMusicAfterAd(),
         onError: () => resumeMusicAfterAd(),
         onRewarded: () => {
-          createItem(Math.max(1, maxLvl - 1), centerX(), centerY());
+          // Hediye eşyasını merkeze oluştur
+          createItem(Math.max(1, maxLvl - 1));
           showRewardPopup('gift');
           showToast(T().reward_gift);
         }
       }
     });
   } else {
-    createItem(Math.max(1, maxLvl - 1), centerX(), centerY());
+    // Test modu için
+    createItem(Math.max(1, maxLvl - 1));
     showRewardPopup('gift');
-    showToast(T().reward_gift);
   }
 }
 
@@ -1978,7 +1995,7 @@ YaGames.init().then(sdk => {
     drawGround();
     loadGame();
     setTimeout(() => {
-      if (!musicMuted) startMusic();
+      if (!musicMuted) startMusic();  
     }, 800);
   });
 }).catch(() => {
