@@ -646,6 +646,7 @@ html, body {
   position: relative;
   transition: filter .1s;
   border-radius: 2px;
+  overflow: hidden;
 }
 
 .item:hover .item-slot {
@@ -659,6 +660,7 @@ html, body {
   background-repeat: no-repeat;
   background-position: center;
   pointer-events: none;
+  image-rendering: pixelated;
 }
 
 .item-lvl {
@@ -1098,7 +1100,7 @@ html, body {
     <div class="hotbar-bg">
       <div class="shop-card">
         <button id="btn-1" class="buy-btn" onclick="buy(1)" title="PNG 1 - 25 Gold">
-          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:75%;height:75%;"><rect fill="#5d9e2f" width="100" height="100"/><rect x="10" y="10" width="20" height="20" fill="#4a7a24"/><rect x="70" y="10" width="20" height="20" fill="#4a7a24"/><rect x="10" y="70" width="20" height="20" fill="#4a7a24"/><rect x="70" y="70" width="20" height="20" fill="#4a7a24"/><rect x="40" y="40" width="20" height="20" fill="#6fb03f"/></svg>
+          <div class="slot-img" style="background-image: url('assets/png1.png')"></div>
           <div id="p-1" class="price-tag">25</div>
         </button>
         <span class="shop-label">PNG 1</span>
@@ -1106,7 +1108,7 @@ html, body {
       
       <div id="dyn-slot" class="shop-card" style="display:none">
         <button id="btn-dyn" class="buy-btn" title="Dynamic PNG">
-          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:75%;height:75%;"><rect fill="#00c853" width="100" height="100"/><rect x="15" y="15" width="15" height="15" fill="#009624"/><rect x="70" y="15" width="15" height="15" fill="#009624"/><rect x="15" y="70" width="15" height="15" fill="#009624"/><rect x="70" y="70" width="15" height="15" fill="#009624"/><circle cx="50" cy="50" r="12" fill="#00e676"/></svg>
+          <div class="slot-img" id="dyn-img" style="background-image: url('assets/png2.png')"></div>
           <div id="p-dyn" class="price-tag">0</div>
         </button>
         <span class="shop-label" id="txt-dyn">PNG ?</span>
@@ -1361,6 +1363,27 @@ document.addEventListener('dragstart', e => e.preventDefault());
 
 <!-- GAME ENGINE -->
 <script>
+// Asset yükleme sistemi
+const assetCache = {};
+const MAX_LEVEL = 20;
+
+async function loadAsset(name) {
+  if (assetCache[name]) return assetCache[name];
+  
+  try {
+    const response = await fetch(`assets/${name}.png`);
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      assetCache[name] = url;
+      return url;
+    }
+  } catch (e) {
+    console.error(`Asset yükleme hatası: ${name}`, e);
+  }
+  return null;
+}
+
 const LANGS = {
   tr: {
     load0: 'Dünya Oluşturuluyor...', load1: 'Çiftlikler Yükleniyor...', load2: 'Koyunlar Sayılıyor...', load3: 'Oyun Hazır!',
@@ -1610,7 +1633,7 @@ function updateUI() {
     document.getElementById('btn-dyn').onclick = () => {
       if (money >= dp) {
         money -= dp;
-        createItem(dl, sx(), sy());
+        createItem(dl, centerX(), centerY());
         sfxBuy();
         updateUI();
       }
@@ -1622,6 +1645,14 @@ function updateUI() {
   document.getElementById('goal-rew').textContent = `+${fmt(getPrice(maxLvl + 1) * 3)} 💰`;
 }
 
+function centerX() {
+  return window.innerWidth / 2 + (Math.random() - 0.5) * 150;
+}
+
+function centerY() {
+  return window.innerHeight / 2 + (Math.random() - 0.5) * 150;
+}
+
 function sx() {
   return window.innerWidth * (0.2 + Math.random() * .6);
 }
@@ -1631,7 +1662,7 @@ function sy() {
 }
 
 /* ITEMS */
-function createItem(lvl, x, y) {
+async function createItem(lvl, x, y) {
   lvl = parseInt(lvl);
   const el = document.createElement('div');
   el.className = 'item';
@@ -1645,13 +1676,14 @@ function createItem(lvl, x, y) {
   el.dataset.lvl = lvl;
   
   const rc = rarityClass(lvl);
-  const svgColors = [
-    '#5d9e2f', '#6fb03f', '#7ec550', '#4a7a24',
-    '#f09000', '#ffb000', '#00c853', '#009624'
-  ];
-  const color = svgColors[Math.min(lvl - 1, svgColors.length - 1)];
   
-  el.innerHTML = `<div class="item-slot ${rc}"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="item-img"><rect fill="${color}" width="100" height="100"/><rect x="10" y="10" width="20" height="20" fill="#333" opacity="0.3"/><rect x="70" y="10" width="20" height="20" fill="#333" opacity="0.3"/><rect x="10" y="70" width="20" height="20" fill="#333" opacity="0.3"/><rect x="70" y="70" width="20" height="20" fill="#333" opacity="0.3"/></svg><div class="item-lvl">${lvl}</div></div>`;
+  // Asset yükleme
+  const assetName = `png${lvl}`;
+  const assetUrl = await loadAsset(assetName);
+  
+  const bgImage = assetUrl ? `url('${assetUrl}')` : 'none';
+  
+  el.innerHTML = `<div class="item-slot ${rc}"><div class="item-img" style="background-image: ${bgImage}"></div><div class="item-lvl">${lvl}</div></div>`;
   
   el.style.transform = 'translate(-50%,-50%) scale(0)';
   el.style.transition = 'transform .25s cubic-bezier(.34,1.56,.64,1)';
@@ -1807,7 +1839,7 @@ function buy(lvl) {
   const c = getPrice(lvl);
   if (money >= c) {
     money -= c;
-    createItem(lvl, sx(), sy());
+    createItem(lvl, centerX(), centerY());
     sfxBuy();
     updateUI();
   }
@@ -1865,8 +1897,8 @@ function loadGame() {
 }
 
 function firstTime() {
-  createItem(1, sx(), sy());
-  createItem(1, sx(), sy());
+  createItem(1, centerX(), centerY());
+  createItem(1, centerX(), centerY());
   applyTrans();
   showTutorial();
 }
@@ -1905,14 +1937,14 @@ function watchGift() {
         onClose: () => resumeMusicAfterAd(),
         onError: () => resumeMusicAfterAd(),
         onRewarded: () => {
-          createItem(Math.max(1, maxLvl - 1), sx(), sy());
+          createItem(Math.max(1, maxLvl - 1), centerX(), centerY());
           showRewardPopup('gift');
           showToast(T().reward_gift);
         }
       }
     });
   } else {
-    createItem(Math.max(1, maxLvl - 1), sx(), sy());
+    createItem(Math.max(1, maxLvl - 1), centerX(), centerY());
     showRewardPopup('gift');
     showToast(T().reward_gift);
   }
