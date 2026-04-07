@@ -1211,9 +1211,17 @@ function stopMusic() {
 
 function pauseMusicForAd() {
   stopMusic();
+  // Ses motorunu tamamen dondur
+  if (audioCtx && audioCtx.state === 'running') {
+    audioCtx.suspend();
+  }
 }
 
 function resumeMusicAfterAd() {
+  // Ses motorunu tekrar uyandır
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
   if (!musicMuted && isPageVisible) startMusic();
 }
 
@@ -1328,10 +1336,14 @@ function drawGround() {
   for (let i = 0; i < cols; i += 3) ctx.fillRect(i * bs, 70, bs * 2, bs);
 }
 
+let resizeTimer;
 window.addEventListener('resize', () => {
-  drawClouds();
-  drawGround();
-  clampAllItems();
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    drawClouds();
+    drawGround();
+    clampAllItems();
+  }, 100); // Ekran oturana kadar 100ms bekle
 });
 
 window.addEventListener('orientationchange', () => {
@@ -1344,10 +1356,15 @@ window.addEventListener('orientationchange', () => {
 
 function clampAllItems() {
   document.querySelectorAll('.item').forEach(item => {
-    const hw = item.offsetWidth / 2, hh = item.offsetHeight / 2;
-    let x = parseFloat(item.style.left), y = parseFloat(item.style.top);
+    const hw = item.offsetWidth / 2 || 30;
+    const hh = item.offsetHeight / 2 || 30;
+    let x = parseFloat(item.style.left);
+    let y = parseFloat(item.style.top);
+    
+    // Güvenli alan hesaplaması (üst HUD ve alt bar payı bırakılarak)
     x = Math.max(hw, Math.min(window.innerWidth - hw, x));
-    y = Math.max(hh, Math.min(window.innerHeight * .82, y));
+    y = Math.max(hh + 80, Math.min(window.innerHeight - hh - 120, y)); 
+    
     item.style.left = x + 'px';
     item.style.top = y + 'px';
   });
@@ -1926,10 +1943,10 @@ function watchTurbo() {
     pauseMusicForAd();
     ysdk.adv.showRewardedVideo({
       callbacks: {
-        onOpen: () => {},
+        onOpen: () => pauseMusicForAd(), // Reklam açıldığında sesi kes
         onClose: () => resumeMusicAfterAd(),
         onError: () => resumeMusicAfterAd(),
-        onRewarded: () => {
+        onRewarded: () => { ... }
           turboTime += turboMax;
           showRewardPopup('turbo');
           showToast(T().turbo_on);
